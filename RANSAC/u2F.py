@@ -3,6 +3,11 @@ import p2e
 import seig
 
 def u2F(u, str=''):
+    """
+        This function estimates fundamental matrix using ortogonal LS regression
+        u2F(u) estimates F from u using NORMU
+        u2F(u,'nonorm') disables normalization
+    """
     if str == 'nonorm':
         donorm = False
     else:
