@@ -6,6 +6,17 @@ import nsamples
 import u2F
 
 def rEG(u, th, th7=None, conf=0.95):
+    """
+        The function rEG is a robust computation of epipolar geometry based on RANSAC
+    :param u: point correspondences (6xn), where n is the number of corrs.
+    :param th: threshold value for the Sampson's distance (see FDs)
+    :param th7: threshold for inliers to iterate on F (default = th)
+    :param conf: confidence level of self-termination  (default = .95)
+
+    :return:
+        F: The best estimated fundamental matrix.
+        inls: An array indicating which correspondences are inliers.
+    """
     MAX_SAM = 100000
     iter_amount = 0.5
 
