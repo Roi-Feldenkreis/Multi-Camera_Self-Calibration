@@ -10,10 +10,14 @@ def p2e(u):
 
     Returns:
     --------
-    e : numpy.ndarray a 2xN array where each column represents the point in Euclidean coordinates.
+    E : numpy.ndarray a 2xN array where each column represents the point in Euclidean coordinates.
     """
-    e = u[:2, :] / u[2, :]
-    return e
+    E2 = []
+    for i in range(len(u)):
+        e = [u[i][0] / u[i][2] ,u[i][1] / u[i][2]]
+        E2.append(e)
+    E = np.array(E2)
+    return E
 
 # Example usage
 # u = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
