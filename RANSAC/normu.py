@@ -2,6 +2,18 @@ import numpy as np
 import p2e
 
 def normu(u):
+    """
+    Computes a normalization transformation matrix for a set of 2D points to improve numerical stability.
+
+    Parameters:
+    -----------
+    u : numpy.ndarray a 3xN array of points in homogeneous coordinates. (If u is already in 2D (2xN), it is used directly).
+
+    Returns:
+    --------
+    A : numpy.ndarray a 3x3 normalization matrix that translates and scales the points to have a mean of zero 
+        and an average distance of sqrt(2) from the origin.
+    """
     # If u is 3xN, convert it to 2xN by using p2e equivalent
     if u.shape[0] == 3:
         u = p2e(u)
@@ -25,6 +37,6 @@ def normu(u):
     return A
 
 # Example usage
-u = np.random.rand(3, 10)  # Example u matrix with 10 points in homogeneous coordinates
-A = normu(u)
-print(A)
+# u = np.random.rand(3, 10)  # Example u matrix with 10 points in homogeneous coordinates
+# A = normu(u)
+# print(A)
