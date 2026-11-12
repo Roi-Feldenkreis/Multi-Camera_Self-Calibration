@@ -1,0 +1,79 @@
+{
+  "run_id": "run_002",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": false,
+    "mat_ok": false,
+    "py_errors": [
+      0.6,
+      0.78,
+      0.76,
+      0.49,
+      0.82,
+      0.89,
+      1.29,
+      0.37,
+      0.8,
+      0.83,
+      1.13,
+      0.37,
+      0.85,
+      0.88,
+      1.42,
+      0.37,
+      0.79,
+      0.69,
+      1.05,
+      0.34,
+      0.73,
+      0.53,
+      0.83,
+      0.31,
+      0.59,
+      0.53,
+      0.61,
+      0.4
+    ],
+    "mat_errors": [],
+    "py_mean": 0.7160714285714284,
+    "mat_mean": null,
+    "cross_consistent": null,
+    "status": "CRASHED",
+    "notes": [
+      "Python: mean reproj error 0.7161 >= threshold 0.5",
+      "MATLAB: non-zero exit (1)",
+      "  \u2514 {\bError using validateHandleToPrint\nNo figure to print.\n\nError in validate (line 17)\npj = validateHandleToPrint(pj);\n     ^^^^^^^^^^^^^^^^^^^^^^^^^\nError in print (line 67)\npj = validate( pj );\n     ^^^^^^^^^^^^^^\nError in goradf (line 49)\n      eval(['print -depsc ', strdata, sprintf('NonLinModel.c"
+    ]
+  },
+  "py_result": {
+    "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_181909\\run_002\\python_output.log"
+  },
+  "mat_result": {
+    "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260329_181909/run_002'); gocal_run",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_181909\\run_002\\matlab_output.log"
+  }
+}

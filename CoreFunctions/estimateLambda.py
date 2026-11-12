@@ -43,7 +43,3 @@ def estimateLambda(Ws, pair):
             Lambda[j, p] = Lambda[i, p] * (norm(cross_product) ** 2 / np.sum(cross_product * (F_ij.T @ q_jp)))
 
     return Lambda
-
-# Example usage:
-# Assuming Ws is a 3*nxm matrix and pair is a list of dictionaries with keys 'F' and 'idxin'
-# Lambda = estimateLambda(Ws, pair)

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from RANSAC_Algorithm import REG
-from RANSAC_Algorithm import fsampson
+from RANSAC_Algorithm import Fsampson
 
 
 def generate_synthetic_data(num_points=100, outlier_ratio=0.3, noise_level=1.0):

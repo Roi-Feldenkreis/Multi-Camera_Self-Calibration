@@ -1,0 +1,382 @@
+[
+  {
+    "run_id": "run_001",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": false,
+      "mat_ok": false,
+      "py_errors": [
+        0.51
+      ],
+      "mat_errors": [
+        0.5
+      ],
+      "py_mean": 0.51,
+      "mat_mean": 0.5,
+      "py_std": 0.47,
+      "mat_std": 0.41,
+      "cross_consistent": true,
+      "status": "BAD",
+      "notes": [
+        "Python: mean reproj error 0.5100 >= 0.5",
+        "MATLAB: mean reproj error 0.5000 >= 0.5"
+      ]
+    },
+    "timing": {
+      "py_secs": 274.2,
+      "mat_secs": 179.8,
+      "wall_secs": 274.2,
+      "saved_secs": 179.8
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_001\\python_output.log",
+      "elapsed_secs": 274.2
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_001'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_001\\matlab_output.log",
+      "elapsed_secs": 179.8
+    }
+  },
+  {
+    "run_id": "run_002",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": true,
+      "mat_ok": false,
+      "py_errors": [
+        0.37
+      ],
+      "mat_errors": [
+        0.56
+      ],
+      "py_mean": 0.37,
+      "mat_mean": 0.56,
+      "py_std": 0.32,
+      "mat_std": 0.42,
+      "cross_consistent": false,
+      "status": "BAD",
+      "notes": [
+        "MATLAB: mean reproj error 0.5600 >= 0.5",
+        "MATLAB vs Python differ by 0.1900 px (tol 0.05)"
+      ]
+    },
+    "timing": {
+      "py_secs": 186.2,
+      "mat_secs": 142.3,
+      "wall_secs": 186.2,
+      "saved_secs": 142.3
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_002\\python_output.log",
+      "elapsed_secs": 186.2
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_002'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_002\\matlab_output.log",
+      "elapsed_secs": 142.3
+    }
+  },
+  {
+    "run_id": "run_003",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": false,
+      "mat_ok": false,
+      "py_errors": [
+        0.66
+      ],
+      "mat_errors": [
+        0.59
+      ],
+      "py_mean": 0.66,
+      "mat_mean": 0.59,
+      "py_std": 0.59,
+      "mat_std": 0.45,
+      "cross_consistent": false,
+      "status": "BAD",
+      "notes": [
+        "Python: mean reproj error 0.6600 >= 0.5",
+        "MATLAB: mean reproj error 0.5900 >= 0.5",
+        "MATLAB vs Python differ by 0.0700 px (tol 0.05)"
+      ]
+    },
+    "timing": {
+      "py_secs": 231.9,
+      "mat_secs": 158.6,
+      "wall_secs": 231.9,
+      "saved_secs": 158.6
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_003\\python_output.log",
+      "elapsed_secs": 231.9
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_003'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_003\\matlab_output.log",
+      "elapsed_secs": 158.6
+    }
+  },
+  {
+    "run_id": "run_004",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": false,
+      "mat_ok": false,
+      "py_errors": [
+        0.53
+      ],
+      "mat_errors": [
+        0.59
+      ],
+      "py_mean": 0.53,
+      "mat_mean": 0.59,
+      "py_std": 0.45,
+      "mat_std": 0.45,
+      "cross_consistent": false,
+      "status": "BAD",
+      "notes": [
+        "Python: mean reproj error 0.5300 >= 0.5",
+        "MATLAB: mean reproj error 0.5900 >= 0.5",
+        "MATLAB vs Python differ by 0.0600 px (tol 0.05)"
+      ]
+    },
+    "timing": {
+      "py_secs": 230.5,
+      "mat_secs": 169.4,
+      "wall_secs": 230.5,
+      "saved_secs": 169.4
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_004\\python_output.log",
+      "elapsed_secs": 230.5
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_004'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_004\\matlab_output.log",
+      "elapsed_secs": 169.4
+    }
+  },
+  {
+    "run_id": "run_005",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": true,
+      "mat_ok": false,
+      "py_errors": [
+        0.41
+      ],
+      "mat_errors": [
+        0.56
+      ],
+      "py_mean": 0.41,
+      "mat_mean": 0.56,
+      "py_std": 0.37,
+      "mat_std": 0.55,
+      "cross_consistent": false,
+      "status": "BAD",
+      "notes": [
+        "MATLAB: mean reproj error 0.5600 >= 0.5",
+        "MATLAB vs Python differ by 0.1500 px (tol 0.05)"
+      ]
+    },
+    "timing": {
+      "py_secs": 194.8,
+      "mat_secs": 142.6,
+      "wall_secs": 194.8,
+      "saved_secs": 142.6
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_005\\python_output.log",
+      "elapsed_secs": 194.8
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_005'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_005\\matlab_output.log",
+      "elapsed_secs": 142.6
+    }
+  },
+  {
+    "run_id": "run_006",
+    "params": {
+      "Nonlinear-Parameters": [
+        50,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "Nonlinear-Update": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    "verdict": {
+      "py_ok": true,
+      "mat_ok": false,
+      "py_errors": [
+        0.44
+      ],
+      "mat_errors": [
+        0.7
+      ],
+      "py_mean": 0.44,
+      "mat_mean": 0.7,
+      "py_std": 0.35,
+      "mat_std": 0.67,
+      "cross_consistent": false,
+      "status": "BAD",
+      "notes": [
+        "MATLAB: mean reproj error 0.7000 >= 0.5",
+        "MATLAB vs Python differ by 0.2600 px (tol 0.05)"
+      ]
+    },
+    "timing": {
+      "py_secs": 179.2,
+      "mat_secs": 142.9,
+      "wall_secs": 179.2,
+      "saved_secs": 142.9
+    },
+    "py_result": {
+      "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_006\\python_output.log",
+      "elapsed_secs": 179.2
+    },
+    "mat_result": {
+      "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_006'); gocal_run",
+      "returncode": 0,
+      "timed_out": false,
+      "error": null,
+      "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_006\\matlab_output.log",
+      "elapsed_secs": 142.9
+    }
+  }
+]

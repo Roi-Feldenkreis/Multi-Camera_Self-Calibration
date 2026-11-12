@@ -1,0 +1,361 @@
+C:\Users\User\anaconda3\python.exe C:\Users\User\PycharmProjects\Muticameracalb\GoCal.py 
+INFO:CommonCfgAndIO.CalibrationSystem:CalibrationSystem initialized
+INFO:CommonCfgAndIO.CalibrationSystem:Multimedia geometry ENABLED: n1=1.0, n2=[1.46], d=[5.0] mm, n3=1.33
+INFO:CommonCfgAndIO.CalibrationSystem:Loaded config: cam
+INFO:CommonCfgAndIO.CalibrationSystem:Configuration loaded from: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multicamselfcal.cfg
+INFO:CommonCfgAndIO.CalibrationSystem:Data folder: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3
+INFO:CommonCfgAndIO.CalibrationSystem:Looking for camera parameter files (.rad)...
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=616.44, fy=616.44, cx=375.02, cy=245.74
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=611.84, fy=611.84, cx=369.51, cy=247.61
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=615.67, fy=615.67, cx=380.58, cy=234.05
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=597.02, fy=597.02, cx=373.93, cy=246.83
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:Loaded data: 185 frames, 4 cameras
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded 4 camera parameter files (.rad)
+Multi-Camera Self-Calibration, Python version
+************************************************************
+Experiment name: cam
+Multimedia geometry ENABLED: n1=1.0, n2=[1.46], d=[5.0] mm, n3=1.33
+
+********** After 0 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 10.00 ...
+RANSAC: 6 samples, 173 inliers out of 185 points
+RANSAC: 3 samples, 182 inliers out of 185 points
+RANSAC: 4 samples, 178 inliers out of 185 points
+RANSAC: 5 samples, 179 inliers out of 182 points
+177 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.612948 0.526641
+  Metric anchor applied: scale=13.084337, mean cam Z +31.04 → +406.10 mm (target 406.1 mm)
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.30      0.55    173
+  2      0.30      0.50    182
+  3      0.30      0.47    178
+  4      0.35      0.58    179
+***************************************************************
+  Multimedia BA SKIPPED — pre-validation failed:
+    [1] 95% of particles have Zp<=0 (glass bottom at z=-5.00 mm, particle Z range [-6.3451, 67.8725]). Glass thickness t=5.0 mm. LIKELY CAUSE: Xe is in projective/normalised units, not physical mm. Provide .rad calibration files with the true focal length so that euclidize() recovers the correct metric scale.
+  Cameras returned unchanged.
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.580191 0.526641 0.526641
+  Metric anchor applied: scale=16.080330 (Z-flipped), mean cam Z -25.25 → +406.10 mm (target 406.1 mm)
+Multimedia params saved to: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multimedia_params.json
+Per-camera parameters saved: 4 camera{N}.json files
+2D reprojection error
+All points: mean  0.53 pixels, std is 0.32
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors_bars.png
+Running goradf (intrinsic calibration)...
+C:\Users\User\PycharmProjects\Muticameracalb\CalTechToolBoxPython\visualize_distortions.py:180: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam1_complete.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam1_tangential.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam1_radial.png
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:195: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_complete.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_tangential.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_radial.png
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=1189.02, fy=1150.17, cx=375.50, cy=239.50
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=1392.44, fy=1448.15, cx=375.50, cy=239.50
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+  .rad files reloaded — focal lengths: [1189.0, 700.0, 1392.4, 700.0] px
+
+********** After 1 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 6.67 ...
+RANSAC: 7 samples, 170 inliers out of 185 points
+RANSAC: 5 samples, 175 inliers out of 185 points
+RANSAC: 16 samples, 156 inliers out of 185 points
+RANSAC: 2 samples, 173 inliers out of 175 points
+167 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.584100 0.530646
+  Metric anchor applied: scale=251.129002 (Z-flipped), mean cam Z -1.62 → +406.10 mm (target 406.1 mm)
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.34      0.57    170
+  2      0.30      0.51    175
+  3      0.30      0.47    156
+  4      0.33      0.57    173
+***************************************************************
+  Multimedia BA SKIPPED — pre-validation failed:
+    [1] 84% of particles have Zp<=0 (glass bottom at z=-5.00 mm, particle Z range [-2028.0590, 352.7644]). Glass thickness t=5.0 mm. LIKELY CAUSE: Xe is in projective/normalised units, not physical mm. Provide .rad calibration files with the true focal length so that euclidize() recovers the correct metric scale.
+  Cameras returned unchanged.
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.569494 0.530646 0.531749
+  Metric anchor applied: scale=174.540607, mean cam Z +2.33 → +406.10 mm (target 406.1 mm)
+Multimedia params saved to: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multimedia_params.json
+Per-camera parameters saved: 4 camera{N}.json files
+2D reprojection error
+All points: mean  0.53 pixels, std is 0.32
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors_bars.png
+Running goradf (intrinsic calibration)...
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:195: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+Warning: View #0 ill-conditioned (cond=7.3e+09 > 1.0e+06). Image set inactive.
+C:\Users\User\PycharmProjects\Muticameracalb\CalTechToolBoxPython\visualize_distortions.py:180: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_complete.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_tangential.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_radial.png
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=806.33, fy=806.33, cx=375.50, cy=239.50
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+  .rad files reloaded — focal lengths: [700.0, 806.3, 700.0, 700.0] px
+
+********** After 2 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 4.44 ...
+RANSAC: 7 samples, 170 inliers out of 185 points
+RANSAC: 6 samples, 174 inliers out of 185 points
+RANSAC: 30 samples, 145 inliers out of 185 points
+RANSAC: 10 samples, 154 inliers out of 174 points
+156 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.589691 0.520081
+  Metric anchor applied: scale=20.956120 (Z-flipped), mean cam Z -19.38 → +406.10 mm (target 406.1 mm)
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.31      0.54    170
+  2      0.34      0.52    174
+  3      0.34      0.46    145
+  4      0.35      0.56    154
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.591010 0.520081 0.520438
+  Metric anchor applied: scale=3.597417, mean cam Z +112.89 → +406.10 mm (target 406.1 mm)
+Multimedia params saved to: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multimedia_params.json
+Per-camera parameters saved: 4 camera{N}.json files
+2D reprojection error
+All points: mean  798.44 pixels, std is 210.97
+***************************************************
+W A R N I N G: the reprojection error is relatively high !
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors_bars.png
+Running goradf (intrinsic calibration)...
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:195: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_complete.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_tangential.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam3_radial.png
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=2176.00, fy=2222.08, cx=375.50, cy=239.50
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+  .rad files reloaded — focal lengths: [700.0, 700.0, 2176.0, 700.0] px
+
+********** After 3 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 2.96 ...
+RANSAC: 15 samples, 157 inliers out of 185 points
+RANSAC: 12 samples, 161 inliers out of 185 points
+RANSAC: 67 samples, 132 inliers out of 185 points
+RANSAC: 23 samples, 132 inliers out of 161 points
+137 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ... C:\Users\User\PycharmProjects\Muticameracalb\CalTechToolBoxPython\visualize_distortions.py:180: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+ 0.553118 0.500708
+  Metric anchor applied: scale=62.251943, mean cam Z +6.52 → +406.10 mm (target 406.1 mm)
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.28      0.51    157
+  2      0.28      0.48    161
+  3      0.29      0.46    132
+  4      0.29      0.54    132
+***************************************************************
+  Multimedia BA SKIPPED — pre-validation failed:
+    [1] 100% of particles have Zp<=0 (glass bottom at z=-5.00 mm, particle Z range [35.6366, 212.8916]). Glass thickness t=5.0 mm. LIKELY CAUSE: Xe is in projective/normalised units, not physical mm. Provide .rad calibration files with the true focal length so that euclidize() recovers the correct metric scale.
+  Cameras returned unchanged.
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.564019 0.500708 0.500708
+  Metric anchor applied: scale=56.711494, mean cam Z +7.16 → +406.10 mm (target 406.1 mm)
+Multimedia params saved to: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multimedia_params.json
+Per-camera parameters saved: 4 camera{N}.json files
+2D reprojection error
+All points: mean  0.50 pixels, std is 0.29
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors_bars.png
+Running goradf (intrinsic calibration)...
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+  .rad files reloaded — focal lengths: [700.0, 700.0, 700.0, 700.0] px
+
+********** After 4 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 1.98 ...
+RANSAC: 36 samples, 142 inliers out of 185 points
+RANSAC: 18 samples, 155 inliers out of 185 points
+RANSAC: 129 samples, 122 inliers out of 185 points
+RANSAC: 27 samples, 123 inliers out of 155 points
+123 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ... C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:195: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+ 0.590956 0.517112
+  Metric anchor applied: scale=137.034796, mean cam Z +2.96 → +406.10 mm (target 406.1 mm)
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.28      0.52    142
+  2      0.26      0.48    155
+  3      0.31      0.51    122
+  4      0.31      0.56    123
+***************************************************************
+  Multimedia BA SKIPPED — pre-validation failed:
+    [1] 100% of particles have Zp<=0 (glass bottom at z=-5.00 mm, particle Z range [170.1060, 286.5402]). Glass thickness t=5.0 mm. LIKELY CAUSE: Xe is in projective/normalised units, not physical mm. Provide .rad calibration files with the true focal length so that euclidize() recovers the correct metric scale.
+  Cameras returned unchanged.
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.595499 0.517112 0.517112
+  Metric anchor applied: scale=123.667801, mean cam Z +3.28 → +406.10 mm (target 406.1 mm)
+Multimedia params saved to: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\multimedia_params.json
+Per-camera parameters saved: 4 camera{N}.json files
+2D reprojection error
+All points: mean  0.52 pixels, std is 0.30
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\reprerrors_bars.png
+Running goradf (intrinsic calibration)...
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_complete.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_tangential.png
+Saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\NonLinModel.cam2_radial.png
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:195: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+C:\Users\User\anaconda3\Lib\site-packages\numpy\core\_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+C:\Users\User\PycharmProjects\Muticameracalb\CalTechToolBoxPython\visualize_distortions.py:180: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 1 parameters from cam1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 2 parameters from cam2.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=2461.95, fy=2246.76, cx=375.50, cy=239.50
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 3 parameters from cam3.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+INFO:CommonCfgAndIO.CalibrationSystem:  ✅ Loaded camera 4 parameters from cam4.rad
+INFO:CommonCfgAndIO.CalibrationSystem:     fx=700.00, fy=700.00, cx=320.00, cy=240.00
+INFO:CommonCfgAndIO.CalibrationSystem:     Distortion: 6 coefficients
+  .rad files reloaded — focal lengths: [700.0, 2462.0, 700.0, 700.0] px
+  Multimedia: forcing second iteration for metric reconstruction.
+
+Calibration completed after 5 iteration(s)
+************************************************************
+
+Alignment to ground truth: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\ground_truth.json
+============================================================
+CALIBRATION vs GROUND TRUTH — ALIGNMENT REPORT
+============================================================
+Ground truth source : JSON file
+Ground truth unit   : mm
+Similarity transform applied (Procrustes)
+  Scale factor : 2.239841
+  RMS error before alignment : 636.7427
+  RMS error after  alignment : 67.2364  [mm]
+
+Per-camera position error (after alignment):
+  Camera            Error
+  ------------------------
+  Cam 1           58.4463  [mm]
+  Cam 2           63.3107  [mm]
+  Cam 3           77.3605  [mm]
+  Cam 4           68.3674  [mm]
+  ------------------------
+  Mean            66.8712  [mm]
+  Max             77.3605  [mm]
+============================================================
+  Alignment report saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\alignment_report.txt
+  Comparison plot saved: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\caldata_refracted_step3\alignment_comparison.png
+  points4cal{N}.dat re-saved with aligned 3D coordinates
+
+Process finished with exit code 0

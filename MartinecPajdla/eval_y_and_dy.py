@@ -1,13 +1,31 @@
 """
 eval_y_and_dy - Evaluate function value and Jacobian for bundle adjustment
-Converted from MATLAB to Python
+Coordinate system note
+    ----------------------
+    All computation in this function operates in conditioned projective space:
+        P0, X0, TP, TX — from normP() and normx() applied to projective matrices
+        y              — observations after H_k image conditioning
+        X during LM    — X0_cond + TX[n] @ iX_n  (normalized projective)
+
+    cameras_mm is in metric world coordinates (mm from euclidize()).
+    These two spaces cannot be mixed directly. Replacing the projection model
+    x = P @ X with observation_equation_221(X_world, cam, x_obs, y_obs) requires
+    knowing the full projective→metric transform (euclidize) and the normx
+    inverse — neither is available here.
+
+    The multimedia correction for Step 3.9 is therefore split across two stages:
+        BEFORE BA: _multimedia_refine_X in fill_mm_bundle
+        AFTER  BA: _mm_refine_X_from_q  in bundle_PX_proj (post-BA X refinement)
+        ERROR:     reprerror in EstimateReprojectionError (multimedia error metrics)
+
 """
 
 import numpy as np
 from scipy.sparse import csr_matrix
-from typing import Tuple, List, Optional
+from typing import Tuple, List
 from MartinecPajdla.Utils import Utils
-
+# Multimedia modules
+from Multimedia.Iterative_radial_shift import collinearity_condition
 
 def eval_y_and_dy(p: np.ndarray,
                  P0: np.ndarray,
@@ -16,7 +34,11 @@ def eval_y_and_dy(p: np.ndarray,
                  TX: List[np.ndarray],
                  y: np.ndarray,
                  qivis: np.ndarray,
-                 RADIAL: bool = False) -> Tuple[np.ndarray, csr_matrix]:
+                 RADIAL: bool = False,
+                 cameras_mm=None,
+                 lut=None,
+                 z_glass_top: float = 0.0,
+                 q_orig=None) -> Tuple[np.ndarray, csr_matrix]:
     """
     Evaluate function value and Jacobian for bundle adjustment.
 
@@ -35,14 +57,36 @@ def eval_y_and_dy(p: np.ndarray,
         y: Observations to match
         qivis: Visibility matrix (K x N), 1=visible 0=not visible
         RADIAL: Include radial distortion (default False)
+        cameras_mm: list of CameraParams or None.
+            Metric camera objects from previous euclidize() call.
+            Stored for use when a metric-space residual path is activated.
+            See bundle_PX_proj_EXPLANATION.md for the architectural context.
+        lut: MultiCameraLUT or None.
+            Per-camera radial-shift lookup table. Stored alongside cameras_mm.
+        z_glass_top: float.
+            Z-coordinate of the air/glass interface in mm.
+        q_orig: np.ndarray (2K x N) or None.
+            Original pixel-space observations BEFORE image conditioning.
+            Consistent coordinate frame with cameras_mm (pixel units).
+            Stored for use when the metric residual path is activated.
 
     Returns:
         y_residual: Residual vector (predicted - observed)
         J: Jacobian matrix (sparse)
+
     """
 
     K, N = qivis.shape
     NR = 3 if RADIAL else 0
+
+    # Store multimedia params as named locals — available to any future
+    # metric-space residual path added to this function
+    _cameras_mm  = cameras_mm
+    _lut         = lut
+    _z_glass_top = z_glass_top
+    _q_orig      = q_orig
+    _mm_active   = (cameras_mm is not None and lut is not None
+                    and q_orig is not None)
 
     # ---------------------------------------------------------------
     # Rearrange p -> P, X

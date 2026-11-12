@@ -1,0 +1,2 @@
+config_file=C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\cause\caldata_refracted_wide400_c4n123\multicamselfcal.cfg
+data_folder=C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\cause\caldata_refracted_wide400_c4n123

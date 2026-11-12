@@ -1,0 +1,49 @@
+{
+  "data_path": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\DATA20100906_134124",
+  "img_path": "",
+  "basename": "cam",
+  "img_names": "",
+  "img_extension": "jpg",
+  "num_cameras": 4,
+  "num_projectors": 0,
+  "led_size": 7,
+  "led_color": "green",
+  "led_threshold": 30,
+  "subpix": 0.5,
+  "resolution": [
+    640,
+    480
+  ],
+  "projector_resolution": [
+    1024,
+    768
+  ],
+  "nonlinear_parameters": [
+    50.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "nonlinear_update": [
+    1,
+    0,
+    1,
+    0,
+    0,
+    0
+  ],
+  "do_global_iterations": true,
+  "global_iteration_max": 5,
+  "global_iteration_threshold": 0.5,
+  "initial_tolerance": 10.0,
+  "num_cameras_fill": 2,
+  "do_bundle_adjustment": true,
+  "undo_radial": false,
+  "min_points_value": 30,
+  "n_tuples": 3,
+  "square_pixels": true,
+  "use_nth_frame": 2,
+  "align_existing": false
+}

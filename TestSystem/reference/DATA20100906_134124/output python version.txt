@@ -1,0 +1,172 @@
+import sys; print('Python %s on %s' % (sys.version, sys.platform))
+C:\Users\User\anaconda3\python.exe -X pycache_prefix=C:\Users\User\AppData\Local\JetBrains\PyCharmCE2024.1\cpython-cache "C:/Program Files/JetBrains/PyCharm Community Edition 2022.3.2/plugins/python-ce/helpers/pydev/pydevd.py" --multiprocess --qt-support=auto --client 127.0.0.1 --port 50424 --file C:\Users\User\PycharmProjects\Muticameracalb\GoCal.py 
+Connected to pydev debugger (build 241.18034.82)
+INFO:CommonCfgAndIO.CalibrationSystem:CalibrationSystem initialized
+INFO:CommonCfgAndIO.CalibrationSystem:Loaded config: basename
+INFO:CommonCfgAndIO.CalibrationSystem:Configuration loaded from: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\multicamselfcal.cfg
+INFO:CommonCfgAndIO.CalibrationSystem:Data folder: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124
+INFO:CommonCfgAndIO.CalibrationSystem:Looking for camera parameter files (.rad)...
+WARNING:CommonCfgAndIO.CalibrationSystem:Camera parameter file not found: C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\basename1.rad
+INFO:CommonCfgAndIO.CalibrationSystem:Loaded data: 563 frames, 4 cameras
+Multi-Camera Self-Calibration, Python version based on Tomas Svoboda et al.
+************************************************************
+Experiment name: basename
+********** After 0 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 10.00 ...
+RANSAC: 3 samples, 519 inliers out of 523 points
+RANSAC: 3 samples, 504 inliers out of 519 points
+RANSAC: 61 samples, 310 inliers out of 430 points
+RANSAC: 15 samples, 307 inliers out of 359 points
+439 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.629379 0.615480
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.62      0.66    310
+  2      0.60      0.60    519
+  3      0.71      0.68    504
+  4      0.39      0.50    307
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.616460 0.609436                0.001983172608 [rms]  0.01789849587 [max]
+      10 [lam]: 0.001978940116 [rms]   0.0179642552 [max]        inf [stepmax]
+ 0.611822
+2D reprojection error
+All points: mean  0.61 pixels, std is 0.61
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors_bars.png
+********** After 1 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 6.67 ...
+RANSAC: 3 samples, 516 inliers out of 523 points
+RANSAC: 5 samples, 488 inliers out of 516 points
+RANSAC: 120 samples, 287 inliers out of 432 points
+RANSAC: 22 samples, 290 inliers out of 357 points
+411 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.605700 0.573923
+************************************************************
+Number of detected outliers:   0
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.58      0.65    287
+  2      0.54      0.54    516
+  3      0.68      0.62    488
+  4      0.34      0.47    290
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.612896 0.581096                0.001882635163 [rms]  0.01808193214 [max]
+      10 [lam]: 0.001881144161 [rms]   0.0179742048 [max]        inf [stepmax]
+ 0.583283
+2D reprojection error
+All points: mean  0.58 pixels, std is 0.58
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors_bars.png
+********** After 2 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 4.44 ...
+RANSAC: 7 samples, 481 inliers out of 523 points
+RANSAC: 4 samples, 465 inliers out of 481 points
+RANSAC: 255 samples, 242 inliers out of 400 points
+RANSAC: 20 samples, 270 inliers out of 324 points
+370 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.632969 0.642547
+************************************************************
+Number of detected outliers:   2
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.66      0.77    240
+  2      0.62      0.58    479
+  3      0.77      0.76    463
+  4      0.33      0.43    270
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.609766 0.611024                0.001934510442 [rms]  0.01430624426 [max]
+   1e+03 [lam]: 0.001934238941 [rms]  0.01427532727 [max]        inf [stepmax]
+   1e+04 [lam]: 0.001934197446 [rms]  0.01427160596 [max] 0.00015559 [stepmax]
+   1e+04 [lam]: 0.001934162696 [rms]  0.01426785816 [max] 2.1593e-05 [stepmax]
+   1e+04 [lam]: 0.001934134586 [rms]  0.01426408458 [max] 2.1462e-05 [stepmax]
+   1e+04 [lam]: 0.001934113014 [rms]  0.01426028594 [max] 2.1334e-05 [stepmax]
+   1e+04 [lam]: 0.001934097882 [rms]  0.01425646292 [max] 2.1209e-05 [stepmax]
+   1e+04 [lam]: 0.001934089096 [rms]   0.0142526162 [max] 2.1085e-05 [stepmax]
+   1e+04 [lam]: 0.001934086563 [rms]  0.01424874644 [max] 2.0963e-05 [stepmax]
+ 0.611469
+2D reprojection error
+All points: mean  0.61 pixels, std is 0.58
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors_bars.png
+********** After 3 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 2.96 ...
+RANSAC: 14 samples, 447 inliers out of 523 points
+RANSAC: 7 samples, 412 inliers out of 447 points
+RANSAC: 782 samples, 201 inliers out of 382 points
+RANSAC: 65 samples, 253 inliers out of 296 points
+339 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.530783 0.515843
+************************************************************
+Number of detected outliers:   1
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.56      0.60    201
+  2      0.51      0.51    446
+  3      0.48      0.53    411
+  4      0.32      0.42    252
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.541689 0.522875                0.001619809695 [rms]  0.00994600824 [max]
+   1e+03 [lam]: 0.001619704336 [rms] 0.009951575608 [max]        inf [stepmax]
+ 0.523066
+2D reprojection error
+All points: mean  0.52 pixels, std is 0.47
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors_bars.png
+********** After 4 iteration *******************************************
+RANSAC validation step running with tolerance threshold: 1.98 ...
+RANSAC: 29 samples, 413 inliers out of 523 points
+RANSAC: 368 samples, 252 inliers out of 436 points
+RANSAC: 3892 samples, 149 inliers out of 346 points
+RANSAC: 73 samples, 190 inliers out of 269 points
+182 points/frames have survived validations so far
+Filling of missing points is running ...
+Repr. error in proj. space (no fact./fact.) is ...  0.495309 0.449618
+************************************************************
+Number of detected outliers:   5
+About cameras (Id, 2D reprojection error, #inliers):
+CamId    std       mean     #inliers 
+  1      0.52      0.49    146
+  2      0.44      0.41    408
+  3      0.59      0.48    249
+  4      0.33      0.40    185
+***************************************************************
+**************************************************************
+Refinement by using Bundle Adjustment
+Repr. error in proj. space (no fact./fact./BA) is ...  0.459182 0.395533                 0.00123728553 [rms] 0.009224410432 [max]
+   1e+02 [lam]: 0.001237109677 [rms] 0.009277003368 [max]        inf [stepmax]
+   1e+04 [lam]: 0.001237098914 [rms] 0.009277401196 [max] 0.00018575 [stepmax]
+   1e+04 [lam]: 0.001237089337 [rms] 0.009277803176 [max] 4.9495e-06 [stepmax]
+   1e+04 [lam]: 0.001237080943 [rms] 0.009278209266 [max] 4.9379e-06 [stepmax]
+   1e+04 [lam]: 0.001237073729 [rms] 0.009278619425 [max] 4.9263e-06 [stepmax]
+   1e+04 [lam]: 0.001237067692 [rms] 0.009279033614 [max] 4.9148e-06 [stepmax]
+   1e+04 [lam]: 0.001237062828 [rms] 0.009279451791 [max] 4.9033e-06 [stepmax]
+   1e+04 [lam]: 0.001237059134 [rms] 0.009279873919 [max]  4.892e-06 [stepmax]
+   1e+04 [lam]: 0.001237056609 [rms] 0.009280299958 [max] 4.8807e-06 [stepmax]
+   1e+04 [lam]: 0.001237055248 [rms] 0.009280729869 [max] 4.8695e-06 [stepmax]
+   1e+04 [lam]:  0.00123705505 [rms] 0.009281163613 [max] 4.8583e-06 [stepmax]
+ 0.395364
+2D reprojection error
+All points: mean  0.40 pixels, std is 0.37
+Reprojection error plots saved to:
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors.png
+  C:\Users\User\PycharmProjects\Muticameracalb\TestSystem\DATA20100906_134124\reprerrors_bars.png
+Calibration completed after 5 iteration(s)
+************************************************************

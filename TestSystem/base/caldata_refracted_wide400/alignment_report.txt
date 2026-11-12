@@ -1,0 +1,21 @@
+============================================================
+CALIBRATION vs GROUND TRUTH — ALIGNMENT REPORT
+============================================================
+Ground truth source : JSON file
+Ground truth unit   : mm
+Similarity transform applied (Procrustes)
+  Scale factor : 1.000001
+  RMS error before alignment : 628.0433
+  RMS error after  alignment : 0.0877  [mm]
+
+Per-camera position error (after alignment):
+  Camera            Error
+  ------------------------
+  Cam 1            0.0957  [mm]
+  Cam 2            0.0860  [mm]
+  Cam 3            0.0766  [mm]
+  Cam 4            0.0913  [mm]
+  ------------------------
+  Mean             0.0874  [mm]
+  Max              0.0957  [mm]
+============================================================

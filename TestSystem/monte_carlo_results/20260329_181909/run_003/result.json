@@ -1,0 +1,91 @@
+{
+  "run_id": "run_003",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": false,
+    "mat_ok": false,
+    "py_errors": [
+      0.58,
+      0.72,
+      0.75,
+      0.38,
+      0.83,
+      0.84,
+      1.34,
+      0.35,
+      0.78,
+      0.83,
+      1.21,
+      0.33,
+      0.84,
+      0.68,
+      1.14,
+      0.37,
+      0.76,
+      0.61,
+      0.95,
+      0.34,
+      0.59,
+      0.58,
+      0.8,
+      0.31,
+      0.56,
+      0.47,
+      0.72,
+      0.29,
+      0.62,
+      0.54,
+      0.66,
+      0.42,
+      0.49,
+      0.45,
+      0.62,
+      0.31,
+      0.5,
+      0.38,
+      0.62,
+      0.52
+    ],
+    "mat_errors": [],
+    "py_mean": 0.6269999999999998,
+    "mat_mean": null,
+    "cross_consistent": null,
+    "status": "CRASHED",
+    "notes": [
+      "Python: mean reproj error 0.6270 >= threshold 0.5",
+      "MATLAB: non-zero exit (1)",
+      "  \u2514 {\bError using validateHandleToPrint\nNo figure to print.\n\nError in validate (line 17)\npj = validateHandleToPrint(pj);\n     ^^^^^^^^^^^^^^^^^^^^^^^^^\nError in print (line 67)\npj = validate( pj );\n     ^^^^^^^^^^^^^^\nError in evalreprerror (line 50)\neval(['print -depsc ', char(config.paths.data), 'repr"
+    ]
+  },
+  "py_result": {
+    "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_181909\\run_003\\python_output.log"
+  },
+  "mat_result": {
+    "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260329_181909/run_003'); gocal_run",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_181909\\run_003\\matlab_output.log"
+  }
+}

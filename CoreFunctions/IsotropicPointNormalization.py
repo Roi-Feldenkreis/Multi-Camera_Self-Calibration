@@ -39,6 +39,3 @@ def isptnorm(x):
 
     return xnorm, T
 
-# Example usage
-# x = np.array([[...], [...], ...])  # Define your input array
-# xnorm, T = isptnorm(x)

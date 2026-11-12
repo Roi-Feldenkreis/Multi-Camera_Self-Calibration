@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def findoutl(cam, inliers, INL_TOL, NUM_CAMS_FILL):
+def findoutl(cam, Inliers, INL_TOL, NUM_CAMS_FILL):
     """
     Finds outliers in cameras based on 2D reprojection errors.
 
@@ -12,7 +12,7 @@ def findoutl(cam, inliers, INL_TOL, NUM_CAMS_FILL):
                          - 'err2d': Array of 2D errors for each point.
                          - 'idlin': Array of linear indices for the points.
                          - 'visandrec': Array of visible and reconstructed point indices.
-    inliers (dict): A dictionary containing:
+    Inliers (dict): A dictionary containing:
                     - 'IdMat': A matrix indicating detected points (MxN where M is number of cameras, N is number of points).
                     - 'idx': Array of inlier indices.
     INL_TOL (float): Tolerance for identifying outliers based on 2D errors.
@@ -21,13 +21,13 @@ def findoutl(cam, inliers, INL_TOL, NUM_CAMS_FILL):
     Returns:
     tuple: A tuple containing:
            - outliers (int): The number of outlier points.
-           - inliers (dict): Updated inliers dictionary.
+           - Inliers (dict): Updated inliers dictionary.
     """
 
     CAMS = len(cam)  # Number of cameras
 
     # Initialize a matrix to mark outliers
-    idxoutMat = np.zeros_like(inliers['IdMat'])
+    idxoutMat = np.zeros_like(Inliers['IdMat'])
 
     for i in range(CAMS):
         # Determine if the camera has outliers based on mean and standard deviation of 2D errors
@@ -42,39 +42,12 @@ def findoutl(cam, inliers, INL_TOL, NUM_CAMS_FILL):
         idxoutMat[i, cam[i]['idlin'][cam[i]['visandrec'][idxout]]] = 1
 
     # Zero out columns in IdMat with at least one outlier
-    inliers['IdMat'][:, np.sum(idxoutMat, axis=0) > 0] = 0
+    Inliers['IdMat'][:, np.sum(idxoutMat, axis=0) > 0] = 0
 
     # Find indices of inliers that are detected by enough cameras
-    inliers['idx'] = np.where(np.sum(inliers['IdMat'], axis=0) >= inliers['IdMat'].shape[0] - NUM_CAMS_FILL)[0]
+    Inliers['idx'] = np.where(np.sum(Inliers['IdMat'], axis=0) >= Inliers['IdMat'].shape[0] - NUM_CAMS_FILL)[0]
 
     # Count the number of outlier points
     outliers = np.sum(np.sum(idxoutMat, axis=0) > 0)
 
-    return outliers, inliers
-
-
-# Example usage
-"""
-cam = [
-    {
-        'std2Derr': 0.5,
-        'mean2Derr': 0.3,
-        'err2d': np.random.rand(10),
-        'idlin': np.arange(10),
-        'visandrec': np.arange(10)
-    } for _ in range(5)
-]
-
-inliers = {
-    'IdMat': (np.random.rand(5, 10) > 0.5).astype(int),
-    'idx': []
-}
-
-INL_TOL = 0.2
-NUM_CAMS_FILL = 2
-
-outliers, inliers = findoutl(cam, inliers, INL_TOL, NUM_CAMS_FILL)
-print("Outliers:", outliers)
-print("Inliers IdMat:", inliers['IdMat'])
-print("Inliers idx:", inliers['idx'])
-"""
+    return outliers, Inliers

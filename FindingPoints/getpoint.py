@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from scikit import measure
+from skimage import measure
 from scipy.ndimage import gaussian_filter
 from scipy.signal import correlate2d
 import matplotlib.pyplot as plt

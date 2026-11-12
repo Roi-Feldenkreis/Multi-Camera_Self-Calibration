@@ -1,71 +1,69 @@
 import numpy as np
-from RANSAC import rEG
-
-
-def add(list, id, value):
-    #TODO: creat this function
-    return 0
-
-
-def remove(list, id):
-    #TODO: creat this function
-    return 0
-
+from RANSAC_Algorithm.REG import reg
 
 
 def findinl(Ws, IdMat, tol):
-    '''
-     FindInl    find inliers in joint image matrix by pairwise epipolar geometry function IdMatIn = findinl(Ws,IdMat,tol)
+    """
+    Find inliers in joint image matrix by pairwise epipolar geometry.
 
-    :param Ws:  3MxN joint image matrix
-    :param IdMat:  MxN ... 0 -> no point detected
-                           1 -> point detected
-    :param tol:  [pixels] tolerance for the epipolar geometry
-                 the point are accpted as outliers only if they
-                 are closer to the epipolar line than tol
-    :return:
-                IdMat ... MxN ... 0 -> no point detected
-                                  1 -> point detected
-    '''
+    Parameters
+    ----------
+    Ws : numpy.ndarray
+        Joint image matrix (3*M x N), M = number of cameras, N = number of points
+    IdMat : numpy.ndarray
+        Indicator matrix (M x N), 0 = no point, 1 = point detected
+    tol : float
+        Tolerance in pixels for epipolar geometry
+
+    Returns
+    -------
+    IdMatIn : numpy.ndarray
+        Inlier indicator matrix (same shape as IdMat)
+    """
+
     NoCams = IdMat.shape[0]
 
-    # fill the array with structures not_used denoted as 0
-    not_used = [{'pts': np.sum(IdMat[i, :])} for i in range(NoCams)]
-    used = [{'pts': -1} for _ in range(NoCams)]
+    # Track camera usage: -1 means processed/used
+    not_used = np.array([np.sum(IdMat[i, :]) for i in range(NoCams)])
+    used = np.full(NoCams, -1, dtype=int)
 
-    # allocate IdMat for outliers
     IdMatIn = np.zeros_like(IdMat)
+    IdMat_work = IdMat.copy()
 
-    while np.sum([x['pts'] for x in not_used]) > 1 - NoCams:
-        buff, id_cam_max = max((x['pts'], i) for i, x in enumerate(not_used))
-        used = add(used, id_cam_max, not_used[id_cam_max]['pts'])
-        not_used = remove(not_used, id_cam_max)
-        Mask = np.tile(IdMat[id_cam_max, :], (NoCams, 1))
-        Corresp = Mask & IdMat
-        Corresp[id_cam_max, :] = 0
-        buff, id_cam_to_pair = max((np.sum(Corresp[i, :]), i) for i in range(NoCams))
-        idx_corr_to_pair = np.where(np.sum(IdMat[[id_cam_max, id_cam_to_pair], :], axis=0) == 2)[0]
+    while np.sum(not_used) > (1 - NoCams):
+        # Find camera with most detected points
+        id_cam_max = np.argmax(not_used)
+        used[id_cam_max] = not_used[id_cam_max]
+        not_used[id_cam_max] = -1
 
-        if idx_corr_to_pair.size < 8:
-            raise ValueError('Not enough points to compute epipolar geometry in RANSAC validation')
+        # Find correspondences with other cameras
+        Mask = np.tile(IdMat_work[id_cam_max, :], (NoCams, 1))
+        Corresp = np.logical_and(Mask, IdMat_work.astype(bool))
+        Corresp[id_cam_max, :] = False
 
-        Wspair = np.vstack([Ws[id_cam_max * 3 - 2:id_cam_max * 3 + 1, idx_corr_to_pair],
-                            Ws[id_cam_to_pair * 3 - 2:id_cam_to_pair * 3 + 1, idx_corr_to_pair]])
+        # Find camera with most correspondences
+        id_cam_to_pair = np.argmax(np.sum(Corresp, axis=1))
 
-        F, inls = rEG(Wspair, tol, tol, 0.99)
+        # Get indices of points visible in both cameras
+        combined = IdMat_work[id_cam_max, :] + IdMat_work[id_cam_to_pair, :]
+        idx_corr_to_pair = np.where(combined == 2)[0]
+
+        if len(idx_corr_to_pair) < 8:
+            raise ValueError("Not enough points to compute epipolar geometry in RANSAC validation")
+
+        # Extract corresponding points from both cameras
+        Wspair = np.vstack([
+            Ws[id_cam_max * 3: id_cam_max * 3 + 3, idx_corr_to_pair],
+            Ws[id_cam_to_pair * 3: id_cam_to_pair * 3 + 3, idx_corr_to_pair]])
+
+        # Compute epipolar geometry and find inliers
+        F, inls = reg(Wspair, tol, tol, 0.99)
+
+        # Update inlier matrix
         IdMatIn[id_cam_max, idx_corr_to_pair[inls]] = 1
-        IdMat[id_cam_max, :] = 0
-        IdMat[id_cam_max, idx_corr_to_pair[inls]] = 1
+
+        # Update working IdMat
+        IdMat_work[id_cam_max, :] = 0
+        IdMat_work[id_cam_max, idx_corr_to_pair[inls]] = 1
 
     return IdMatIn
-
-
-# Example usage of the findinl function
-"""
-    Ws = np.random.rand(3 * 5, 10)  # Example 5 cameras, 10 points
-    IdMat = (np.random.rand(5, 10) > 0.5).astype(int)  # Random detection matrix
-    tol = 1.0  # Example tolerance
-    
-    IdMatIn = findinl(Ws, IdMat, tol)
-    print(IdMatIn)
-"""

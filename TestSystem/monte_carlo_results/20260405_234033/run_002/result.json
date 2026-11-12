@@ -1,0 +1,63 @@
+{
+  "run_id": "run_002",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": true,
+    "mat_ok": false,
+    "py_errors": [
+      0.37
+    ],
+    "mat_errors": [
+      0.56
+    ],
+    "py_mean": 0.37,
+    "mat_mean": 0.56,
+    "py_std": 0.32,
+    "mat_std": 0.42,
+    "cross_consistent": false,
+    "status": "BAD",
+    "notes": [
+      "MATLAB: mean reproj error 0.5600 >= 0.5",
+      "MATLAB vs Python differ by 0.1900 px (tol 0.05)"
+    ]
+  },
+  "timing": {
+    "py_secs": 186.2,
+    "mat_secs": 142.3,
+    "wall_secs": 186.2,
+    "saved_secs": 142.3
+  },
+  "py_result": {
+    "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_002\\python_output.log",
+    "elapsed_secs": 186.2
+  },
+  "mat_result": {
+    "cmd": "matlab -batch addpath('C:/Users/User/PycharmProjects/Muticameracalb/TestSystem/monte_carlo_results/20260405_234033/run_002'); gocal_run",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260405_234033\\run_002\\matlab_output.log",
+    "elapsed_secs": 142.3
+  }
+}

@@ -1,7 +1,7 @@
 import numpy as np
-from u2fdlt import u2fdlt
-from fsampson import fsampson
-from nsamples import nsamples
+from RANSAC_Algorithm.U2fdlt import u2fdlt
+from RANSAC_Algorithm.Fsampson import fsampson
+from RANSAC_Algorithm.Nsamples import nsamples
 
 
 def reg(u, th, th4=None, conf=0.99, ss=8):
@@ -12,84 +12,57 @@ def reg(u, th, th4=None, conf=0.99, ss=8):
     -----------
     u : numpy.ndarray (6xN)
         Point pairs in homogeneous coordinates
-        First 3 rows are points in first image
-        Last 3 rows are points in second image
     th : float
         Inlier tolerance threshold in pixels
     th4 : float, optional
         Currently not used (kept for compatibility)
     conf : float, optional (default=0.99)
-        Confidence level (higher values mean more samples will be taken)
+        Confidence level
     ss : int, optional (default=8)
-        Sample size - number of point pairs for each model hypothesis
-
-    Returns:
-    --------
-    F : numpy.ndarray (3x3)
-        Estimated fundamental matrix
-    inls : numpy.ndarray (N,) of bool
-        Boolean mask indicating inliers (True) and outliers (False)
-
-    Notes:
-    ------
-    This implements the RANSAC algorithm to robustly estimate the
-    fundamental matrix in the presence of outliers.
+        Sample size
     """
 
-    MAX_SAM = 100000  # Maximum number of random samples
+    MAX_SAM = 100000
 
     len_pts = u.shape[1]
 
-    # If th4 not provided, use th
     if th4 is None:
         th4 = th
 
-    # Initialize variables
-    ptr = np.arange(len_pts)  # Point indices
-    max_i = 5  # Minimum number of inliers to consider
-    max_sam = MAX_SAM  # Maximum number of samples
-
-    no_sam = 0  # Current number of samples
-    no_mod = 0  # Current number of models (not used in this implementation)
-
-    # Square the threshold and double it
+    max_i = 5
+    max_sam = MAX_SAM
+    no_sam = 0
     th = 2 * th ** 2
 
-    # RANSAC main loop
-    inls = None
+    inls = np.zeros(len_pts, dtype=bool)  # safe default: all outliers
     F = None
 
     while no_sam < max_sam:
-        # Randomly select ss points
-        for pos in range(ss):
-            idx = pos + int(np.ceil(np.random.rand() * (len_pts - pos)))
-            # Swap positions to avoid resampling
-            ptr[pos], ptr[idx] = ptr[idx], ptr[pos]
-
+        # np.random.choice is faster than manual Fisher-Yates for small ss
+        sample_idx = np.random.choice(len_pts, ss, replace=False)
         no_sam += 1
 
-        # Estimate model from the sample
-        sF = u2fdlt(u[:, ptr[0:ss]], False)
-
-        # Calculate errors using the Sampson distance
+        sF = u2fdlt(u[:, sample_idx], False)
         errs = fsampson(sF, u)
-
-        # Determine inliers based on threshold
         v = errs < th
         no_i = np.sum(v)
 
-        # If this is the best model so far, update
         if max_i < no_i:
             inls = v
             F = sF
             max_i = no_i
-            # Update the maximum number of samples based on inlier ratio
             max_sam = min(max_sam, nsamples(max_i, len_pts, ss, conf))
 
-    # Refine the fundamental matrix using all inliers and with point normalization
+    # Safety check: if no model was ever found, raise clearly
+    if F is None or np.sum(inls) < ss:
+        if F is None:
+            raise ValueError("RANSAC failed to find any valid model (all iterations had ≤5 inliers)")
+        print(f"WARNING: No valid model found with more than {max_i} inliers")
+        return F, inls
+
+    # Refine using all inliers with normalization
     F = u2fdlt(u[:, inls], True)
 
-    # Display results
     if no_sam == MAX_SAM:
         print(f"WARNING: RANSAC - termination forced after {no_sam} samples")
     else:

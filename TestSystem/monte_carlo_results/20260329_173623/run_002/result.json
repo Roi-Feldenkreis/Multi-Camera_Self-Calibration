@@ -1,0 +1,87 @@
+{
+  "run_id": "run_002",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": false,
+    "mat_ok": false,
+    "py_errors": [
+      0.57,
+      0.7,
+      0.71,
+      0.37,
+      0.63,
+      0.81,
+      1.01,
+      0.37,
+      0.63,
+      0.7,
+      1.0,
+      0.33,
+      0.58,
+      0.61,
+      0.85,
+      0.3,
+      0.6,
+      0.63,
+      0.8,
+      0.29,
+      0.57,
+      0.6,
+      0.82,
+      0.3,
+      0.5,
+      0.47,
+      0.65,
+      0.21,
+      0.59,
+      0.41,
+      0.65,
+      0.39,
+      0.46,
+      0.37,
+      0.63,
+      0.35
+    ],
+    "mat_errors": [],
+    "py_mean": 0.5683333333333335,
+    "mat_mean": null,
+    "cross_consistent": null,
+    "status": "CRASHED",
+    "notes": [
+      "Python: mean reproj error 0.5683 >= threshold 0.5",
+      "MATLAB: non-zero exit (1)",
+      "  \u2514 {\bUnrecognized function or variable 'str_cut'.\n\nError in setpaths (line 8)\nMatlab_data = [ str_cut(Start_path) 'Matlab_data/' ];\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in gocal_run (line 167)\n  setpaths;\t\t% set paths for M&P algorithms\n  ^^^^^^^^^^^^\n}\b \nERROR: MATLAB error Exit"
+    ]
+  },
+  "py_result": {
+    "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_173623\\run_002\\python_output.log"
+  },
+  "mat_result": {
+    "cmd": "matlab -batch gocal_run",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_173623\\run_002\\matlab_output.log"
+  }
+}

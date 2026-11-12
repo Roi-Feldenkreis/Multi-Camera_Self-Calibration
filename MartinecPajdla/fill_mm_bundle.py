@@ -13,9 +13,94 @@ from MartinecPajdla.Utils import Utils
 from MartinecPajdla.fill_mm import fill_mm
 from MartinecPajdla.bundle_PX_proj import bundle_PX_proj
 
+# Note: Multimedia ray-tracing imports were removed because the function
+# below (_multimedia_refine_X) is intentionally disabled — see the comment
+# in fill_mm_bundle() Step 2 for the rationale. If you ever re-enable that
+# code path, move the imports inside _multimedia_refine_X as a lazy import
+# so this module continues to load without the Multimedia package.
+
+def _multimedia_refine_X(M, X, r1, r2, cameras_mm, z_glass_top):
+    # Lazy import — only happens if/when this function is called.
+    from Multimedia.Forward_ray_tracing import (
+        trace_ray_through_media,
+        spatial_intersection_multi,
+    )
+    """
+    Refine 3D point positions using multimedia spatial intersection (Maas 2.2.2).
+
+    Called after fill_mm returns projective X, when metric camera positions
+    from a previous iteration are available in cameras_mm. For each recovered
+    point, the function collects refracted rays from every camera that observes
+    it and intersects them using spatial_intersection_multi().
+
+    Parameters
+    ----------
+    M : np.ndarray, shape (3m x n)
+        Measurement matrix with NaN for missing observations.
+    X : np.ndarray, shape (4 x n)
+        Projective 3D points from fill_mm (modified in-place copy).
+    r1 : np.ndarray
+        Indices of recovered cameras (rows in M are 3*r1 : 3*r1+3).
+    r2 : np.ndarray
+        Indices of recovered points (columns in M).
+    cameras_mm : list of CameraParams
+        One per camera row-triple in M, from the previous euclidize() call.
+    z_glass_top : float
+        Z-coordinate of the air/glass interface in mm.
+
+    Returns
+    -------
+    X_ref : np.ndarray, shape (4 x n)
+        Copy of X with refined positions for all successfully intersected points.
+    n_refined : int
+        Number of points where multimedia intersection replaced the projective estimate.
+    mean_rms : float
+        Mean RMS ray distance across all refined points (mm). Quality indicator.
+    """
+    X_ref = X.copy()
+    rms_values = []
+    n_refined = 0
+
+    for j in r2:
+        ray_positions  = []
+        ray_directions = []
+
+        for i in r1:
+            obs = M[3*i:3*i+3, j]
+            if np.any(np.isnan(obs)) or abs(obs[2]) < 1e-12:
+                continue  # this camera does not see this point
+
+            # Normalise homogeneous image coords to metric 2D
+            x_img = obs[0] / obs[2]
+            y_img = obs[1] / obs[2]
+
+            try:
+                pos_w, dir_w = trace_ray_through_media(
+                    cameras_mm[i], x_img, y_img, z_glass_top)
+                ray_positions.append(pos_w)
+                ray_directions.append(dir_w)
+            except (ValueError, IndexError):
+                continue  # total internal reflection or geometry error — skip ray
+
+        if len(ray_positions) < 2:
+            continue  # need at least 2 rays to intersect
+
+        P_hat, rms = spatial_intersection_multi(ray_positions, ray_directions)
+        X_ref[:3, j] = P_hat
+        X_ref[3,  j] = 1.0
+        rms_values.append(rms)
+        n_refined += 1
+
+    mean_rms = float(np.mean(rms_values)) if rms_values else 0.0
+    return X_ref, n_refined, mean_rms
+
+
 def fill_mm_bundle(M: np.ndarray,
                    imsize: np.ndarray,
-                   opt: Optional[Dict] = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, Dict]:
+                   opt: Optional[Dict] = None,
+                   cameras_mm=None,
+                   lut=None,
+                   z_glass_top: float = 0.0) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, Dict]:
     """
     Projective reconstruction from measurement matrix with optional bundle adjustment.
     Calls fill_mm for initial reconstruction, then optionally refines with bundle adjustment.
@@ -28,6 +113,13 @@ def fill_mm_bundle(M: np.ndarray,
             - 'verbose' (True): Print progress
             - 'verbose_short': Short progress (see bundle_PX_proj)
             - ... other options from fill_mm
+        cameras_mm: list of CameraParams, one per camera row-triple in M.
+            None on the first global iteration (no metric positions yet).
+            Provided from the second iteration onward — enables multimedia
+            spatial intersection refinement of X (Step 3.6, Maas 2.2.2).
+        lut: MultiCameraLUT — reserved for Step 3.9 (bundle_PX_proj integration).
+            Not used inside this function yet; passed through for future use.
+        z_glass_top: Z-coordinate of the air/glass interface in mm.
     
     Returns:
         P: Camera matrices (3k x 4) for k recovered images
@@ -37,11 +129,15 @@ def fill_mm_bundle(M: np.ndarray,
         info: Information dict with:
             - 'R_lin': Linear estimation (P @ X before bundle adjustment)
             - 'err': Error dict with 'BA' key if bundle adjustment was run
+            - 'mm_refined': True if multimedia X refinement was applied
+            - 'mm_n_refined': number of points refined
+            - 'mm_mean_rms': mean RMS ray distance after intersection (mm)
             - ... other fields from fill_mm
     
     This is the complete pipeline:
         1. fill_mm: Structure-from-motion reconstruction
-        2. bundle_PX_proj: Nonlinear refinement (optional)
+        2. Multimedia spatial intersection (optional, Step 3.6)
+        3. bundle_PX_proj: Nonlinear refinement (optional)
     """
     
     # Set default options
@@ -57,11 +153,35 @@ def fill_mm_bundle(M: np.ndarray,
     
     # Store linear reconstruction result
     info['R_lin'] = P @ X
-    
-    # Step 2: Bundle adjustment (if requested and feasible)
+
+    # Step 2: Multimedia spatial intersection refinement (Maas 2.2.2, Step 3.6)
+    # Replaces projective X positions with refracted-ray intersections in water.
+    # Only active from iteration 2 onward, when cameras_mm holds metric positions
+    # from the previous euclidize() call. On iteration 0 cameras_mm is None.
     m = M.shape[0] // 3  # Number of images
     n = M.shape[1]        # Number of points
-    
+
+    info['mm_refined']   = False
+    info['mm_n_refined'] = 0
+    info['mm_mean_rms']  = 0.0
+
+    # NOTE: _multimedia_refine_X is intentionally disabled.
+    #
+    # Reason: it replaces projective X values (~0–1, dimensionless) with
+    # metric world coordinates in mm (~100–400). bundle_PX_proj (below) calls
+    # normx() on X immediately afterward — normx() computes a scale factor from
+    # the RMS of all values. With mixed scales (some ~0.1, some ~300), the
+    # conditioning blows up and the BA diverges (observed error: ~5000 instead
+    # of ~0.3 in projective units).
+    #
+    # The multimedia X refinement is correctly handled AFTER euclidize() by
+    # multimedia_bundle_adjustment() in GoCal.py, where X is already in
+    # metric world coordinates. No action needed here.
+    #
+    # if cameras_mm is not None and len(u1) < m and len(u2) < n:
+    #     X, n_ref, mean_rms = _multimedia_refine_X(M, X, r1, r2, ...)
+
+    # Step 3: Bundle adjustment (if requested and feasible)
     # Only run bundle adjustment if:
     # - not disabled by option
     # - some cameras were recovered (len(u1) < m)

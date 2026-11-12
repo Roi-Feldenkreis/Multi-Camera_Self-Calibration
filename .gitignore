@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# IDE
+.idea/
+
+# Run outputs and logs
+logs/
+*.log
+*.cfg.bak
+config_paths_before_*.txt
+
+# one-off helper files
+/_*.bat
+/_*.txt

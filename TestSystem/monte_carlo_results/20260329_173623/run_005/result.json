@@ -1,0 +1,91 @@
+{
+  "run_id": "run_005",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": false,
+    "mat_ok": false,
+    "py_errors": [
+      0.6,
+      0.72,
+      0.82,
+      0.36,
+      0.6,
+      0.75,
+      1.04,
+      0.31,
+      0.63,
+      0.85,
+      1.04,
+      0.34,
+      0.6,
+      0.66,
+      0.88,
+      0.3,
+      0.6,
+      0.67,
+      0.84,
+      0.31,
+      0.6,
+      0.83,
+      1.14,
+      0.32,
+      0.56,
+      0.53,
+      0.71,
+      0.23,
+      0.54,
+      0.47,
+      0.62,
+      0.24,
+      0.58,
+      0.51,
+      0.52,
+      0.38,
+      0.56,
+      0.35,
+      0.49,
+      0.37
+    ],
+    "mat_errors": [],
+    "py_mean": 0.58675,
+    "mat_mean": null,
+    "cross_consistent": null,
+    "status": "CRASHED",
+    "notes": [
+      "Python: mean reproj error 0.5867 >= threshold 0.5",
+      "MATLAB: non-zero exit (1)",
+      "  \u2514 {\bUnrecognized function or variable 'str_cut'.\n\nError in setpaths (line 8)\nMatlab_data = [ str_cut(Start_path) 'Matlab_data/' ];\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nError in gocal_run (line 167)\n  setpaths;\t\t% set paths for M&P algorithms\n  ^^^^^^^^^^^^\n}\b \nERROR: MATLAB error Exit"
+    ]
+  },
+  "py_result": {
+    "cmd": "C:\\Users\\User\\anaconda3\\python.exe C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 0,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_173623\\run_005\\python_output.log"
+  },
+  "mat_result": {
+    "cmd": "matlab -batch gocal_run",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_173623\\run_005\\matlab_output.log"
+  }
+}

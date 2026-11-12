@@ -1,0 +1,49 @@
+{
+  "run_id": "run_006",
+  "params": {
+    "Nonlinear-Parameters": [
+      50,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    "Nonlinear-Update": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  "verdict": {
+    "py_ok": false,
+    "mat_ok": false,
+    "py_errors": [],
+    "mat_errors": [],
+    "py_mean": null,
+    "mat_mean": null,
+    "cross_consistent": null,
+    "status": "PARSE_FAIL",
+    "notes": [
+      "Python: non-zero exit (1)",
+      "MATLAB: non-zero exit (1)"
+    ]
+  },
+  "py_result": {
+    "cmd": "python C:\\Users\\User\\PycharmProjects\\Muticameracalb\\Gocal.py",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_171938\\run_006\\python_output.log"
+  },
+  "mat_result": {
+    "cmd": "matlab -batch gocal_run",
+    "returncode": 1,
+    "timed_out": false,
+    "error": null,
+    "log": "C:\\Users\\User\\PycharmProjects\\Muticameracalb\\TestSystem\\monte_carlo_results\\20260329_171938\\run_006\\matlab_output.log"
+  }
+}

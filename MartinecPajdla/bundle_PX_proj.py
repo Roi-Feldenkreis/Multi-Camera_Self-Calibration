@@ -9,16 +9,91 @@ from typing import Tuple, Dict, Optional, List, Callable
 from MartinecPajdla.Utils import Utils
 from MartinecPajdla.eval_y_and_dy import eval_y_and_dy
 
+# Multimedia modules — direct import matching the Multimedia/ package structure
+from Multimedia.Forward_ray_tracing import trace_ray_through_media, spatial_intersection_multi
+
+
+def _mm_refine_X_from_q(q, X_ba, K, N, cameras_mm, z_glass_top):
+    """
+    Refine 3D point positions using multimedia spatial intersection after BA.
+
+    Called after Levenberg-Marquardt converges. Uses the raw 2D observations q
+    (pixel space, principal point subtracted) and metric camera positions from
+    cameras_mm to re-intersect refracted rays per point, replacing the BA's
+    projective estimate of X with a multimedia-corrected metric estimate.
+
+    Parameters
+    ----------
+    q : np.ndarray, shape (2K x N)
+        Euclidean 2D observations (rows 2k, 2k+1 belong to camera k).
+        NaN where camera k does not observe point n.
+    X_ba : np.ndarray, shape (4 x N)
+        3D points as returned by the BA (conditioned projective space).
+        Used as-is for points where multimedia intersection fails.
+    K, N : int
+        Number of cameras and points.
+    cameras_mm : list of CameraParams
+        Metric camera objects (one per row-triple), from previous euclidize().
+    z_glass_top : float
+        Z-coordinate of the air/glass interface in mm.
+
+    Returns
+    -------
+    X_ref : np.ndarray, shape (4 x N)
+        Copy of X_ba with world-coordinate positions for successfully
+        intersected points (X_ref[3,n] = 1.0) and BA positions elsewhere.
+    n_refined : int
+        Number of points replaced by multimedia intersection.
+    mean_rms : float
+        Mean RMS ray distance across refined points (mm).
+    """
+    X_ref = X_ba.copy()
+    rms_values = []
+    n_refined = 0
+
+    for n in range(N):
+        ray_positions  = []
+        ray_directions = []
+
+        for k in range(K):
+            x_obs = q[2*k,   n]
+            y_obs = q[2*k+1, n]
+            if np.isnan(x_obs) or np.isnan(y_obs):
+                continue  # camera k does not see point n
+
+            try:
+                pos_w, dir_w = trace_ray_through_media(
+                    cameras_mm[k], x_obs, y_obs, z_glass_top)
+                ray_positions.append(pos_w)
+                ray_directions.append(dir_w)
+            except (ValueError, IndexError):
+                continue  # total internal reflection or geometry error
+
+        if len(ray_positions) < 2:
+            continue  # need at least 2 rays to intersect
+
+        P_hat, rms = spatial_intersection_multi(ray_positions, ray_directions)
+        X_ref[:3, n] = P_hat
+        X_ref[3,  n] = 1.0
+        rms_values.append(rms)
+        n_refined += 1
+
+    mean_rms = float(np.mean(rms_values)) if rms_values else 0.0
+    return X_ref, n_refined, mean_rms
+
 
 def bundle_PX_proj(P0: np.ndarray,
                   X0: np.ndarray,
                   q: np.ndarray,
                   imsize: np.ndarray,
                   nl_params_all_cams: Optional[List[Dict]] = None,
-                  opt: Optional[Dict] = None) -> Tuple[np.ndarray, np.ndarray]:
+                  opt: Optional[Dict] = None,
+                  cameras_mm=None,
+                  lut=None,
+                  z_glass_top: float = 0.0) -> Tuple[np.ndarray, np.ndarray]:
     """
     Projective bundle adjustment with image conditioning.
-    
+
     Args:
         P0: Initial camera matrices (3K x 4)
         X0: Initial 3D points (4 x N)
@@ -32,11 +107,21 @@ def bundle_PX_proj(P0: np.ndarray,
             - 'max_niter' (10000): Max iterations
             - 'max_stepy' (100*eps): Max step for termination
             - 'lam_init' (1e-4): Initial lambda
-    
+        cameras_mm: list of CameraParams, one per camera row-triple.
+            None = standard projective BA (first iteration or air-only).
+            Provided from second iteration onward — enables post-BA multimedia
+            spatial intersection refinement of X (Step 3.9, Maas 2.2.2).
+            Also stored in opt so eval_y_and_dy can read it once updated.
+        lut: MultiCameraLUT — stored in opt for future eval_y_and_dy integration.
+            Not yet used directly in the LM residual computation.
+        z_glass_top: Z-coordinate of the air/glass interface in mm.
+
     Returns:
         P: Optimized camera matrices (3K x 4)
-        X: Optimized 3D points (4 x N)
-    
+        X: Optimized 3D points (4 x N). When cameras_mm is provided, X contains
+           metric world coordinates (4-vector with w=1) for multimedia-refined
+           points; remaining points keep their projective BA estimate.
+
     Note: P0, X0, q need not be preconditioned - done internally.
     """
     
@@ -47,6 +132,11 @@ def bundle_PX_proj(P0: np.ndarray,
         opt['verbose'] = 1
     if 'verbose_short' not in opt:
         opt['verbose_short'] = 0
+
+    # Store multimedia params in opt so eval_y_and_dy can read them once updated
+    opt['cameras_mm']   = cameras_mm
+    opt['lut']          = lut
+    opt['z_glass_top']  = z_glass_top
     
     # Check radial distortion
     RADIAL = nl_params_all_cams is not None and len(nl_params_all_cams) > 0
@@ -114,8 +204,11 @@ def bundle_PX_proj(P0: np.ndarray,
     
     # Levenberg-Marquardt optimization
     # Use eval_y_and_dy function directly (as in original MATLAB)
+    # Pass multimedia params so eval_y_and_dy has them when its metric path is activated
     def objective(p_vec):
-        return eval_y_and_dy(p_vec, P0_cond, TP, X0_cond, TX, y, qivis, RADIAL)
+        return eval_y_and_dy(p_vec, P0_cond, TP, X0_cond, TX, y, qivis, RADIAL,
+                             cameras_mm=cameras_mm, lut=lut,
+                             z_glass_top=z_glass_top, q_orig=q)
     
     p = levmarq(objective, p0, opt)
     
@@ -142,7 +235,18 @@ def bundle_PX_proj(P0: np.ndarray,
     
     if opt.get('verbose_short', False):
         print(')', end='', flush=True)
-    
+
+    # Post-BA multimedia spatial intersection refinement (Maas 2.2.2, Step 3.9)
+    # Replaces the projective BA estimate of X with metric world coordinates
+    # computed from refracted rays, using cameras_mm from the previous euclidize().
+    # Active from iteration 2 onward; cameras_mm is None on iteration 0.
+    if cameras_mm is not None:
+        X, n_ref, mean_rms = _mm_refine_X_from_q(
+            q, X, K, N, cameras_mm, z_glass_top)
+        if opt.get('verbose', 0):
+            print(f'Multimedia post-BA refinement: {n_ref}/{N} points refined, '
+                  f'mean RMS={mean_rms:.4f} mm')
+
     return P, X
 
 
@@ -201,15 +305,13 @@ def levmarq(F: Callable,
     else:
         eyeJ = np.eye(J.shape[1])
     
-    # Print initial residuals
-    if verbose or verbose_short:
+    # Print initial residuals (only in verbose_short / inline mode).
+    # Per-iteration BA progress is suppressed in normal verbose mode to keep
+    # the output clean — only the final "rms" line printed below is shown.
+    if verbose_short:
         rms = res_scale * np.sqrt(np.mean(Fp ** 2))
         max_res = res_scale * np.max(np.abs(Fp))
-        
-        if not verbose_short:
-            print(f'                {rms:14.10g} [rms] {max_res:14.10g} [max]')
-        else:
-            print(f'(rms/max/stepmax: {rms:g}/{max_res:g}/', end='', flush=True)
+        print(f'(rms/max/stepmax: {rms:g}/{max_res:g}/', end='', flush=True)
     
     # Optimization loop
     while nfail < 20 and stepy * res_scale > max_stepy and niter < max_niter:
@@ -246,16 +348,13 @@ def levmarq(F: Callable,
             lam = min(lam * 10, 1e5)
             nfail += 1
         
-        # Print progress if success
-        if (verbose or verbose_short) and nfail == 0:
+        # Print progress if success — only in verbose_short (inline) mode.
+        # Per-iteration verbose lines are suppressed for cleaner output.
+        if verbose_short and nfail == 0:
             rms = res_scale * np.sqrt(np.mean(Fp ** 2))
             max_res = res_scale * np.max(np.abs(Fp))
             step_scaled = res_scale * stepy
-            
-            if not verbose_short:
-                print(f' {lam:7.2g} [lam]: {rms:14.10g} [rms] {max_res:14.10g} [max] {step_scaled:10.5g} [stepmax]')
-            else:
-                print(f' {rms:g}/{max_res:g}/{step_scaled:g}', end='', flush=True)
+            print(f' {rms:g}/{max_res:g}/{step_scaled:g}', end='', flush=True)
     
     # Check termination reason
     if not max_stepy_undef and stepy * res_scale <= max_stepy:

@@ -1,0 +1,46 @@
+{
+  "cam_id": 3,
+  "position": [
+    -86.39614461623978,
+    147.2607851128196,
+    433.9955159770854
+  ],
+  "angles": [
+    3.4371442325937043,
+    0.06668249901277519,
+    -2.9176992490526317
+  ],
+  "c": 615.6683821194213,
+  "xh": 380.5770288844313,
+  "yh": 234.04981812280874,
+  "k1": 0.0,
+  "k2": 0.0,
+  "k3": 0.0,
+  "p1": 0.0,
+  "p2": 0.0,
+  "a1": 0.0,
+  "a2": 0.0,
+  "multimedia": {
+    "n1": 1.0,
+    "n2": [
+      1.46
+    ],
+    "d": [
+      5.0
+    ],
+    "n3": 1.33
+  },
+  "lens_distortion_precorrected": {
+    "convention": "Caltech/Bouguet kc = [k1, k2, p1, p2, k3], normalised image coordinates",
+    "kc": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "a1": 0.0,
+    "a2": 0.0,
+    "applied_to": "observations, once at load; the k1..a2 fields above are 0 because the multimedia model is a pinhole on corrected coordinates"
+  }
+}

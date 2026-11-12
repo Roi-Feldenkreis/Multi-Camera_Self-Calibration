@@ -1,0 +1,18 @@
+Multi-Camera Calibration Results
+============================================================
+
+Experiment: cam
+Number of Cameras: 4
+Number of Frames: 563
+Subpixel Accuracy: 0.5
+
+Calibration Settings:
+  - Bundle Adjustment: True
+  - Global Iterations: True
+  - N-tuples: 3
+  - Min Points: 30
+  - Use Nth Frame: 2
+
+Files Generated:
+  - config.cfg, config.json
+  - points.dat, IdMat.dat, Res.dat

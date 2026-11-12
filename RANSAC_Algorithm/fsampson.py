@@ -16,31 +16,27 @@ def fsampson(F, u):
 
     Returns:
     --------
-    errs : numpy.ndarray (1xN)
+    errs : numpy.ndarray (N,)
         Sampson distance for each point pair
 
     Notes:
     ------
-    The Sampson distance is an approximation to the geometric error
-    that's more efficient to compute than the true geometric error.
+    Fully vectorized - no Python for loops over points.
     """
 
-    N = u.shape[1]
+    u1 = u[0:3, :]  # 3xN - Points in first image
+    u2 = u[3:6, :]  # 3xN - Points in second image
 
-    u1 = u[0:3, :]  # Points in first image
-    u2 = u[3:6, :]  # Points in second image
+    Fu1  = F   @ u1   # 3xN : F * u1
+    FTu1 = F.T @ u1   # 3xN : F' * u1  (NOTE: uses u1, matching MATLAB)
 
-    errs = np.zeros(N)
+    # Numerator: (u2' * F * u1)^2  ->  shape (N,)
+    numerator = np.sum(u2 * Fu1, axis=0) ** 2
 
-    for i in range(N):
-        Fu1 = F @ u1[:, i]  # F * u1
-        Fu2 = F.T @ u2[:, i]  # F' * u2
+    # Denominator: sum of squares of first 2 rows of Fu1 and FTu1  ->  shape (N,)
+    denominator = (np.sum(Fu1[:2, :]  ** 2, axis=0) +
+                   np.sum(FTu1[:2, :] ** 2, axis=0))
 
-        # Calculate the Sampson distance
-        # (u2.T * F * u1)^2 / (sum of squares of first two components of Fu1 and Fu2)
-        numerator = (u2[:, i].T @ F @ u1[:, i]) ** 2
-        denominator = np.sum(np.concatenate(([Fu1[0:2]], [Fu2[0:2]])) ** 2)
-
-        errs[i] = numerator / denominator
+    errs = numerator / denominator
 
     return errs

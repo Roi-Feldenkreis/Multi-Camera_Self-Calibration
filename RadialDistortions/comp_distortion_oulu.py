@@ -35,7 +35,6 @@ def comp_distortion_oulu(xd, k):
 
     if len(k) == 1:
         # If only one parameter is provided, use simplified model
-        # Note: comp_distortion function not provided in original files,
         # implementing simple radial distortion compensation
         x = comp_distortion(xd, k)
 

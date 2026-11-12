@@ -38,20 +38,9 @@ def rq(X):
     # Calculate the upper triangular matrix R and the unitary matrix Q
     R = Rt @ Qu.T
     Q = Qu @ Qt
-    if(R[1][0] != 0.0 or R[2][0] != 0.0 or R[2][1] != 0.0):
+    if R[1][0] != 0.0 or R[2][0] != 0.0 or R[2][1] != 0.0:
         R[1][0] = 0.0
         R[2][0] = 0.0
         R[2][1] = 0.0
 
     return R, Q
-
-
-# Example usage
-# X = np.random.rand(3, 3)  # Example input matrix
-# print('X =')
-# print(X)
-# R, Q = rq(X)
-# print('R =')
-# print(R)
-# print('Q =')
-# print(Q)
