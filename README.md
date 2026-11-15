@@ -17,8 +17,9 @@ Python, and the multimedia model is built into the reconstruction and the bundle
 
 ## How it works
 
-1. **Input**: per-camera 2-D point observations (`points.dat`, `IdMat.dat`) and a
-   `multicamselfcal.cfg` describing the rig.
+1. **Input**: per-camera 2-D point observations (`Points.dat`, `IdMat.dat`, `Res.dat`) and a
+   `multicamselfcal.cfg` describing the rig. For real recordings these files are produced from
+   the image sequences by `FindingPoints/im2points_real.py` (see below).
 2. **Outlier rejection**: pairwise RANSAC on epipolar geometry (`RANSAC_Algorithm/`).
 3. **Projective reconstruction**: Martinec–Pajdla factorisation with missing data
    (`MartinecPajdla/`).
@@ -54,6 +55,41 @@ of the `.cfg` (refractive indices and glass thickness, `Camera-Glass-Distance`, 
 `LUT-nR` / `LUT-nZp` / `Zp-Max`, intrinsics mode). See
 `Documentation/Configuration File Guide.md` for all keys.
 
+## Finding points in real images
+
+`FindingPoints/im2points_real.py` turns synchronized image sequences (one folder per camera)
+into the pipeline input files. It detects a single bright target (submerged LED or bead) in
+every frame, following Svoboda's im2points recipe:
+
+- background model from separate background frames (`--bg`), or from the sequence itself;
+- blob mask `diff > thr_frac * max(diff)`, rejected if the peak is below `k_sigma` x the
+  background noise, or if there is more than one blob, or it is too small, too large or too
+  elongated (motion blur);
+- sub-pixel position from a 2-D Gaussian fit (fallback: weighted centroid).
+
+It writes `IdMat.dat`, `Points.dat` and `Res.dat` to `--out`. Points are stored raw (distorted
+and refracted), because `GoCal_derefract.py` corrects both. After export it runs sanity checks
+into `<out>/checks/`: a report, sensor-coverage plots and spot-check overlays of detections.
+
+```
+python FindingPoints\im2points_real.py ^
+    --cam "D:\exp1\cam1\*.tif" --cam "D:\exp1\cam2\*.tif" ^
+    --cam "D:\exp1\cam3\*.tif" --cam "D:\exp1\cam4\*.tif" ^
+    --bg  "D:\exp1\bg1\*.tif"  --bg  "D:\exp1\bg2\*.tif" ^
+    --bg  "D:\exp1\bg3\*.tif"  --bg  "D:\exp1\bg4\*.tif" ^
+    --out "D:\exp1\calib_input" --one-based
+```
+
+Give one `--cam` per camera, in pipeline camera order. Detection parameters can be set on the
+command line (`--thr-frac`, `--k-sigma`, `--min-peak`, `--min-area`, `--max-area`, `--max-ecc`,
+`--win-half`, `--subpix gauss|centroid`, `--channel`, `--bg-max-frames`); `--workers N` runs
+cameras in parallel and `--no-checks` skips the sanity checks.
+
+To test the detector, `FindingPoints/make_test.py` renders a synthetic 4-camera LED sequence
+with known positions and reflections into `t/`; `FindingPoints/compare.py <out_dir> [<out_dir2>]`
+scores detection outputs against that ground truth (missed and false detections, RMS error)
+and compares two runs.
+
 ## Layout
 
 | Path | Contents |
@@ -69,7 +105,7 @@ of the `.cfg` (refractive indices and glass thickness, `Camera-Glass-Distance`, 
 | `RadialDistortions/` | Distortion undo (Oulu / Heikkilä models, `.rad` reader) |
 | `RANSAC_Algorithm/` | Pairwise RANSAC for epipolar outlier rejection |
 | `OutputFunctions/` | Saving calibration, reprojection-error plots, alignment and scene plots |
-| `FindingPoints/` | Point detection in images (`ShowPoints.py` overlays detections) |
+| `FindingPoints/` | Point detection: `im2points_real.py` (real-data front end), Svoboda ports `im2points.py` / `getpoint.py` / `im2imstat.py` / `mycorr2.py`, `ShowPoints.py` overlays, `make_test.py` + `compare.py` synthetic detector test |
 | `LocalAlignments/`, `Align and test/` | Aligning the result to a world frame |
 | `Documentation/` | Module explanations, config guide, bug log, run-result summaries |
 | `scripts/data_generation/` | Synthetic dataset builders and config editing (`set_cfg_key.py`) |

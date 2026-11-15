@@ -5,7 +5,7 @@ Ground truth source : JSON file
 Ground truth unit   : mm
 Similarity transform applied (Procrustes)
   Scale factor : 0.995948
-  RMS error before alignment : 525.2861
+  RMS error before alignment : 544.7203
   RMS error after  alignment : 0.3620  [mm]
 
 Per-camera position error (after alignment):

@@ -1,148 +1,119 @@
+"""
+Single-LED detection in one image
+(Python port of MultiCamSelfCal/FindingPoints/getpoint.m).
+
+Method (unchanged from the MATLAB lineage):
+  1. im_thr = |I - avIM| in the LED's colour channel
+  2. reject if max(im_thr) < 5 * stdIM at that pixel, or < LEDthr
+  3. blob = im_thr > blob_frac * max ; reject if more than one blob
+  4. reject if the LED is closer than round(LEDsize/1.2) px to the border
+  5. resample the neighbourhood on a grid with step `subpix` (bicubic)
+  6. normalized cross-correlation (mycorr2) with a Gaussian PSF,
+     sigma = LEDsize/3 ; position = grid node of maximum correlation
+
+Returned position is (x, y) = (column, row), 0-based (NumPy/OpenCV origin).
+
+FIX summary vs. previous version:
+  * images read with IMREAD_UNCHANGED as float64 (grey and 16-bit images now work)
+  * difference computed in float -> no uint8 wrap-around before abs()
+  * BGR channel order respected (red = channel 2, green = channel 1)
+  * avIM / stdIM may be 2-D (same channel as the image), as produced by im2imstat
+  * real Gaussian PSF (previous kernel was gaussian_filter(ones) = flat)
+  * correlation is normalized, via mycorr2 (previous: raw correlate2d)
+  * sub-pixel grid built explicitly -> no off-by-half-pixel from resize()
+"""
 import numpy as np
 import cv2
-from skimage import measure
-from scipy.ndimage import gaussian_filter
-from scipy.signal import correlate2d
-import matplotlib.pyplot as plt
+from scipy import ndimage
+from numpy.lib.stride_tricks import sliding_window_view
+
+from mycorr2 import mycorr2
+
+_CHANNEL = {"blue": 0, "green": 1, "red": 2}
 
 
-def getpoint(imname, showfig, imconfig, avIM, stdIM):
-    """
-    Extracts the position of an LED from an image.
+def read_channel(path, led_color="gray"):
+    img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    if img is None:
+        raise IOError(f"Cannot read image: {path}")
+    if img.ndim == 3:
+        if led_color in _CHANNEL:
+            img = img[:, :, _CHANNEL[led_color]]
+        else:
+            img = cv2.cvtColor(img[:, :, :3], cv2.COLOR_BGR2GRAY)
+    return img.astype(np.float64)
 
-    Parameters:
-    imname (str): Name of the image file (full path expected).
-    showfig (bool): Flag to show figures for debugging (True -> on, False -> off).
-    imconfig (dict): Configuration for image processing, e.g., 'LEDsize', 'LEDthr', 'LEDcolor', 'subpix'.
-    avIM (np.array): Average image for reference.
-    stdIM (np.array): Image of standard deviations.
-    
-    Returns:
-    pos (tuple): Coordinates of the LED (x, y) or (0, 0) if an error occurs.
-    err (bool): Error flag, True if an error occurred.
-    """
-    
-    err = False
-    SUB_PIX = 1 / imconfig['subpix']
-    LEDSIZE = imconfig['LEDsize']
-    LEDTHR = imconfig.get('LEDthr', 70)  # Default threshold is 70 if not specified
 
-    # Read image and check if it's grayscale or RGB
-    im_orig = cv2.imread(imname)
-    if len(im_orig.shape) == 2:  # Grayscale
-        im = {'I': im_orig}
-    else:  # Color image
-        im = {
-            'R': im_orig[:,:,2],  # Red channel
-            'G': im_orig[:,:,1],  # Green channel
-            'B': im_orig[:,:,0],  # Blue channel
-        }
+def _gauss_psf(gsize, sigma):
+    ax = np.arange(-gsize, gsize + 1, dtype=np.float64)
+    g = np.exp(-0.5 * (ax / sigma) ** 2)
+    return np.outer(g, g)
 
-    # Select the correct channel based on LED color
-    if imconfig['LEDcolor'] == 'green':
-        im_thr = np.abs(im['G'] - avIM[:,:,1]).astype(np.uint8)
-        im_std = stdIM[:,:,1]
-        im_fit = im['G']
-    elif imconfig['LEDcolor'] == 'red':
-        im_thr = np.abs(im['R'] - avIM[:,:,0]).astype(np.uint8)
-        im_std = stdIM[:,:,0]
-        im_fit = im['R']
-    else:
-        im_thr = np.abs(im['I'] - avIM).astype(np.uint8)
-        im_std = stdIM
-        im_fit = im['I']
 
-    # Display original and thresholded image if requested
+def getfinepos(im_fit, raw_pos, leds, ledsize, step, showfig=False):
+    """Sub-pixel refinement: bicubic resampling + NCC with a Gaussian PSF."""
+    t = np.arange(-leds, leds + step / 2, step)                  # offsets in px
+    rr, cc = np.meshgrid(raw_pos[0] + t, raw_pos[1] + t, indexing="ij")
+    zoom = ndimage.map_coordinates(im_fit, [rr, cc], order=3, mode="nearest")
+
+    gsize = int(round(ledsize / 2 / step))
+    psf = _gauss_psf(gsize, ledsize / 3 / step)
+    k = 2 * gsize + 1
+    if zoom.shape[0] <= k:
+        raise ValueError("LED neighbourhood smaller than PSF; increase LEDsize/1.2 window")
+
+    win = sliding_window_view(zoom, (k, k))                      # (P, P, k, k)
+    P = win.shape[0]
+    X = win.reshape(P * P, k * k).T                              # im2col layout
+    G = psf.ravel()
+    Gn = G - G.mean()
+    R = mycorr2(X, G, Gn, np.sqrt(np.sum(Gn ** 2))).reshape(P, P)
+
+    r, c = np.unravel_index(np.argmax(R), R.shape)
+    fine = np.array([raw_pos[0] + t[r + gsize], raw_pos[1] + t[c + gsize]])
+
     if showfig:
-        plt.figure()
-        plt.imshow(im_orig)
-        plt.title(f"{imname} original")
-        plt.figure()
-        plt.imshow(im_thr, cmap='gray')
-        plt.title(f"{imname} image to be thresholded")
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(1, 2)
+        ax[0].imshow(zoom, cmap="gray"); ax[0].set_title("resampled")
+        ax[1].imshow(R, cmap="hot"); ax[1].set_title("NCC")
         plt.show()
+    return fine
 
-    max_intensity = np.max(im_thr)
+
+def getpoint(imname, showfig, imconfig, avIM, stdIM, return_reason=False):
+    """
+    imconfig keys: LEDsize (px), LEDcolor ('green'|'red'|'blue'|'gray'),
+                   subpix (grid step in px, e.g. 1/3), LEDthr (default 70),
+                   blob_frac (default 0.99, as in the previous port)
+    Returns ((x, y), err) or ((x, y), err, reason) with return_reason=True.
+    """
+    def out(pos, err, why):
+        return (pos, err, why) if return_reason else (pos, err)
+
+    ledsize = imconfig["LEDsize"]
+    ledthr = imconfig.get("LEDthr", 70)
+    step = imconfig["subpix"]
+    blob_frac = imconfig.get("blob_frac", 0.99)
+
+    im = read_channel(imname, imconfig.get("LEDcolor", "gray"))
+    im_thr = np.abs(im - avIM)
+
     idx = np.argmax(im_thr)
-    if (im_thr.flat[idx] < 5 * im_std.flat[idx]) or (im_thr.flat[idx] < LEDTHR):
-        print(f"No LED in the image. Max intensity: {max_intensity}")
-        return (0, 0), True
-    
-    # Label connected regions (blobs) and find their centroids
-    labeled_img, num = measure.label(im_thr > max_intensity * 0.99, return_num=True)
+    peak = im_thr.flat[idx]
+    if peak < 5 * stdIM.flat[idx] or peak < ledthr:
+        return out((0.0, 0.0), True, "no_led")
+
+    lab, num = ndimage.label(im_thr > blob_frac * peak, structure=np.ones((3, 3)))
     if num > 1:
-        print("More than one blob detected")
-        return (0, 0), True
+        return out((0.0, 0.0), True, "multi_blob")
+    raw_pos = np.round(ndimage.center_of_mass(lab > 0)).astype(int)
 
-    props = measure.regionprops(labeled_img)
-    raw_pos = np.round(props[0].centroid).astype(int)
-
-    # Ensure that the LED is not too close to the border
-    leds_size = round(LEDSIZE / 1.2)
+    leds = int(round(ledsize / 1.2))
     rows, cols = im_thr.shape
-    if (raw_pos[0] - leds_size < 0 or raw_pos[0] + leds_size >= rows or
-            raw_pos[1] - leds_size < 0 or raw_pos[1] + leds_size >= cols):
-        print("LED position too close to image border")
-        return (0, 0), True
+    if (raw_pos[0] - leds < 0 or raw_pos[0] + leds >= rows or
+            raw_pos[1] - leds < 0 or raw_pos[1] + leds >= cols):
+        return out((0.0, 0.0), True, "border")
 
-    # Extract the region of interest around the LED
-    led_rows = slice(raw_pos[0] - leds_size, raw_pos[0] + leds_size + 1)
-    led_cols = slice(raw_pos[1] - leds_size, raw_pos[1] + leds_size + 1)
-    sub_img = im_fit[led_rows, led_cols]
-
-    # Display LED sub-image
-    if showfig:
-        plt.figure()
-        plt.imshow(im_thr > max_intensity * 0.99, cmap='gray')
-        plt.plot(raw_pos[1], raw_pos[0], 'g+')
-        plt.title('LED Detection')
-        plt.show()
-
-    # Refine LED position using Gaussian interpolation
-    fine_pos = getfinepos(sub_img, raw_pos, leds_size, LEDSIZE, SUB_PIX, showfig)
-
-    # Display final LED position
-    if showfig:
-        plt.figure()
-        plt.imshow(im_orig)
-        plt.plot(fine_pos[1], fine_pos[0], 'r+', markersize=25, linewidth=3)
-        plt.title('Final LED Position')
-        plt.show()
-
-    return (fine_pos[1], fine_pos[0]), False
-
-
-def getfinepos(sub_img, raw_pos, leds_size, LEDSIZE, SUB_PIX, showfig=False):
-    """
-    Refine the LED position using interpolation and correlation with a Gaussian PSF.
-    """
-    
-    Gsize = round(SUB_PIX * LEDSIZE / 2)
-    zoomed_img = cv2.resize(sub_img, None, fx=SUB_PIX, fy=SUB_PIX, interpolation=cv2.INTER_CUBIC)
-
-    # Gaussian filter as Point Spread Function (PSF)
-    gaussian = gaussian_filter(np.ones((2*Gsize+1, 2*Gsize+1)), sigma=SUB_PIX * LEDSIZE / 3)
-    
-    # Correlation of the zoomed image with the Gaussian PSF
-    corr_img = correlate2d(zoomed_img, gaussian, mode='same')
-
-    # Find the position of maximum correlation
-    rmax, cmax = np.unravel_index(np.argmax(corr_img), corr_img.shape)
-    fine_pos = raw_pos + (np.array([rmax, cmax]) - np.array(zoomed_img.shape) // 2) / SUB_PIX
-
-    # Plot the interpolated region if requested
-    if showfig:
-        plt.figure()
-        plt.subplot(2, 2, 1)
-        plt.imshow(zoomed_img, cmap='gray')
-        plt.title('Zoomed Image')
-        plt.subplot(2, 2, 2)
-        plt.imshow(corr_img, cmap='hot')
-        plt.title('Correlation Coefficients')
-        plt.show()
-
-    return fine_pos
-
-
-# How to call this function
-# pos, err = getpoint('image.png', True, imconfig, avIM, stdIM)
+    fine = getfinepos(im, raw_pos, leds, ledsize, step, showfig)
+    return out((float(fine[1]), float(fine[0])), False, "ok")

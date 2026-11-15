@@ -1,158 +1,131 @@
+"""
+Find the LED in all frames of all cameras and write the Svoboda input files
+(Python port of MultiCamSelfCal/FindingPoints/im2points.m).
+
+Outputs (in config['out_dir']):
+    IdMat.dat   M x N   1 = point found, 0 = not found
+    Points.dat  3M x N  rows [u; v; 1] per camera, NaN where not found
+    Res.dat     M x 2   (width, height) per camera
+    frame_ids.txt       frame number of each column
+
+FIX summary vs. previous version:
+  * `from getpoint import getpoint` (module was called as a function)
+  * image-processing parameters passed from config['imgs'] (was config['files'])
+  * Points written as 3M x N (was reshape(-1, 3) -> (M*N) x 3, unreadable by gocal)
+  * NaN written as 'NaN' (MATLAB- and NumPy-readable)
+  * frame alignment: frame number = last integer in the file name (slicing was wrong)
+  * statistics delegated to im2imstat (no duplicated code), float, cached as .npy
+  * optional 1-based coordinates to match MATLAB output (config['one_based'])
+  * script body wrapped in main() -> importable, Windows-safe
+"""
 import os
-import numpy as np
-import cv2
+import re
+import glob
 import time
-import getpoint
+import json
+import numpy as np
+
+from getpoint import getpoint
+from im2imstat import im2imstat
+
+_LAST_INT = re.compile(r"(\d+)(?!.*\d)")
 
 
-# Placeholder function to simulate loading configuration
-def read_configuration():
-    config = {
-        'paths': {'img': './images/'},
-        'files': {
-            'imgext': 'png',   # Change to the actual image extension you're using
-            'idxcams': [1, 2, 3],  # Camera IDs
-            'imnames': 'image_%d_',  # Naming pattern for images (image_ID_*)
-            'avIM': './average_cam_%d.png',  # Path for average image files
-            'stdIM': './std_cam_%d.png',  # Path for standard deviation image files
-            'points': './points.txt',
-            'Res': './resolution.txt',
-            'IdMat': './idmat.txt',
-            'maxid': 100  # Max ID for frames
-        },
-        'expname': 'experiment'
+def frame_number(path):
+    m = _LAST_INT.search(os.path.basename(path))
+    if m is None:
+        raise ValueError(f"No frame number in file name: {path}")
+    return int(m.group(1))
+
+
+def default_config():
+    return {
+        "cams": {1: "images/cam1/*.png", 2: "images/cam2/*.png", 3: "images/cam3/*.png"},
+        "out_dir": "calib_input",
+        "imgs": {"LEDsize": 7, "LEDcolor": "gray", "subpix": 1 / 3, "LEDthr": 70},
+        "step4stat": 1,
+        "one_based": True,
+        "showfig": False,
     }
-    return config
 
 
-# Main script starts here
-SHOWFIG = 0  # Show images during point extraction (0 = off)
-STEP4STAT = 1  # Step for computing average and std images, if 1 then all images taken
+def _write_nan_matrix(path, mat, fmt="%.6f"):
+    with open(path, "w") as f:
+        for row in mat:
+            f.write(" ".join("NaN" if np.isnan(x) else fmt % x for x in row) + "\n")
 
-config = read_configuration()
 
-im_dir = config['paths']['img']
-im_ext = config['files']['imgext']
-NoCams = len(config['files']['idxcams'])  # Number of cameras
+def im2points(config):
+    cam_ids = list(config["cams"].keys())
+    M = len(cam_ids)
+    out_dir = config["out_dir"]
+    os.makedirs(out_dir, exist_ok=True)
 
-# Load image names and verify if enough images are available
-seq = []
-for cam_id in config['files']['idxcams']:
-    camera_data = {
-        'camId': cam_id,
-        'data': [],
-    }
-    image_files = [f for f in os.listdir(im_dir) if f.startswith(config['files']['imnames'] % cam_id) and f.endswith(im_ext)]
-    camera_data['data'] = sorted(image_files)
-    camera_data['size'] = len(image_files)
-    
-    if camera_data['size'] < 4:
-        raise ValueError("Not enough images found. Check the image path or name pattern.")
-    
-    seq.append(camera_data)
+    # --- image lists and frame alignment (FrameMat) -----------------------
+    frames = {}
+    for cid in cam_ids:
+        files = sorted(glob.glob(config["cams"][cid]))
+        if len(files) < 4:
+            raise ValueError(f"Camera {cid}: not enough images for {config['cams'][cid]}")
+        frames[cid] = {frame_number(f): f for f in files}
+    frame_ids = sorted(set().union(*[set(d) for d in frames.values()]))
+    N = len(frame_ids)
 
-# Create the occupancy matrix for image frames
-if 'maxid' in config['files']:
-    NoPoints = config['files']['maxid']
-    FrameMat = np.zeros((config['files']['maxid'], NoCams), dtype=int)
-    for i, camera in enumerate(seq):
-        camera['imgidx'] = np.zeros(NoPoints)
-        for j, img in enumerate(camera['data']):
-            FrameMat[int(img[config['files']['imnames'].index('%d') + 1:]), i] = j + 1
-else:
-    NoPoints = min([camera['size'] for camera in seq])
-    FrameMat = np.zeros((NoPoints, NoCams), dtype=int)
-    for i in range(NoCams):
-        FrameMat[:, i] = np.arange(1, NoPoints + 1)
+    # --- background statistics --------------------------------------------
+    t0 = time.time()
+    stats = im2imstat({cid: sorted(frames[cid].values()) for cid in cam_ids},
+                      config["imgs"].get("LEDcolor", "gray"),
+                      os.path.join(out_dir, "stats"), step=config["step4stat"])
+    print(f"Elapsed time for statistics: {time.time() - t0:.1f} s")
 
-# Compute average and standard deviation images
-start_time = time.time()
-for i, camera in enumerate(seq):
-    av_im_path = config['files']['avIM'] % camera['camId']
-    if not os.path.exists(av_im_path):
-        print(f"Computing average image for camera {camera['camId']}")
-        avIM = np.zeros(cv2.imread(os.path.join(im_dir, camera['data'][0])).shape, dtype=np.float64)
-        point_idx = np.arange(0, camera['size'], STEP4STAT)
-        for idx in point_idx:
-            img = cv2.imread(os.path.join(im_dir, camera['data'][idx]))
-            avIM += img.astype(np.float64)
-        avIM = np.uint8(np.round(avIM / len(point_idx)))
-        cv2.imwrite(av_im_path, avIM)
+    # --- find points --------------------------------------------------------
+    print(f"Finding points: {M} cameras, {N} frames")
+    off = 1.0 if config.get("one_based", True) else 0.0
+    IdMat = np.zeros((M, N), dtype=int)
+    Points = np.full((3 * M, N), np.nan)
+    Res = np.zeros((M, 2), dtype=int)
+    for i, cid in enumerate(cam_ids):
+        t1 = time.time()
+        avIM, stdIM = stats[cid]
+        Res[i] = (avIM.shape[1], avIM.shape[0])
+        reasons = {}
+        for j, fid in enumerate(frame_ids):
+            path = frames[cid].get(fid)
+            if path is None:
+                reasons["missing_file"] = reasons.get("missing_file", 0) + 1
+                continue
+            pos, err, why = getpoint(path, config.get("showfig", False), config["imgs"],
+                                     avIM, stdIM, return_reason=True)
+            reasons[why] = reasons.get(why, 0) + 1
+            if not err:
+                IdMat[i, j] = 1
+                Points[3 * i:3 * i + 3, j] = (pos[0] + off, pos[1] + off, 1.0)
+        summary = ", ".join(f"{k}={v}" for k, v in sorted(reasons.items()))
+        print(f"  camera {cid}: {IdMat[i].sum()} points ({summary}), {time.time() - t1:.1f} s")
+
+    np.savetxt(os.path.join(out_dir, "IdMat.dat"), IdMat, fmt="%d")
+    _write_nan_matrix(os.path.join(out_dir, "Points.dat"), Points)
+    np.savetxt(os.path.join(out_dir, "Res.dat"), Res, fmt="%d")
+    with open(os.path.join(out_dir, "frame_ids.txt"), "w") as f:
+        f.write("\n".join(map(str, frame_ids)) + "\n")
+
+    cpf = IdMat.sum(axis=0)
+    print("Overall statistics from im2points:")
+    print(f"  frames (possible 3D points): {N}, cameras: {M}")
+    print(f"  detected in >=1 cam: {(cpf > 0).sum()}, >=3 cams: {(cpf > 2).sum()}, all: {(cpf == M).sum()}")
+    return IdMat, Points, Res, frame_ids
+
+
+def main():
+    import sys
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f:
+            cfg = json.load(f)
+        cfg["cams"] = {int(k): v for k, v in cfg["cams"].items()}
     else:
-        print(f"Average image for camera {camera['camId']} already exists")
+        cfg = default_config()
+    im2points(cfg)
 
-print(f"Elapsed time for computation of average images: {time.time() - start_time:.2f} seconds")
 
-# Compute standard deviation images
-start_time = time.time()
-for i, camera in enumerate(seq):
-    std_im_path = config['files']['stdIM'] % camera['camId']
-    if not os.path.exists(std_im_path):
-        avIM = cv2.imread(config['files']['avIM'] % camera['camId'], cv2.IMREAD_GRAYSCALE).astype(np.float64)
-        print(f"Computing standard deviation image for camera {camera['camId']}")
-        stdIM = np.zeros(avIM.shape, dtype=np.float64)
-        point_idx = np.arange(0, camera['size'], STEP4STAT)
-        for idx in point_idx:
-            img = cv2.imread(os.path.join(im_dir, camera['data'][idx]), cv2.IMREAD_GRAYSCALE)
-            stdIM += (img.astype(np.float64) - avIM) ** 2
-        stdIM = np.uint8(np.round(np.sqrt(stdIM / (len(point_idx) - 1))))
-        cv2.imwrite(std_im_path, stdIM)
-    else:
-        print(f"Standard deviation image for camera {camera['camId']} already exists")
-
-print(f"Elapsed time for computation of standard deviation images: {time.time() - start_time:.2f} seconds")
-
-# Find points in the images
-Ws = []
-Res = []
-IdMat = np.ones((NoCams, NoPoints), dtype=int)
-
-print('*********************************************')
-print(f'Finding points (laser projections) in cameras: {NoCams} cameras, {NoPoints} images for each camera')
-print('*********************************************')
-
-for i, camera in enumerate(seq):
-    t1 = time.time()
-    print(f'Finding points in camera No: {camera["camId"]}')
-    Points = []
-    avIM = cv2.imread(config['files']['avIM'] % camera['camId'], cv2.IMREAD_GRAYSCALE)
-    stdIM = cv2.imread(config['files']['stdIM'] % camera['camId'], cv2.IMREAD_GRAYSCALE)
-    
-    for j in range(NoPoints):
-        print(f'Processing frame {j+1} of {NoPoints}', end="\r")
-        idx2data = FrameMat[j, i]
-        if idx2data:
-            pos, err = getpoint(os.path.join(im_dir, camera['data'][idx2data - 1]), SHOWFIG, config['files'], avIM, stdIM)
-        else:
-            err = True
-        
-        if err:
-            IdMat[i, j] = 0
-            Points.append([np.nan, np.nan, np.nan])
-        else:
-            Points.append([pos[0], pos[1], 1])
-    
-    Ws.append(Points)
-    Res.append([avIM.shape[1], avIM.shape[0]])
-    
-    t2 = time.time()
-    print(f"\nElapsed time for finding points in one camera: {int((t2-t1) // 60)} minutes {int((t2-t1) % 60)} seconds")
-    print(f"{np.sum([p[2] for p in Points if not np.isnan(p[2])])} points found in camera No: {camera['camId']}")
-
-# Save the results
-Ws = np.array(Ws)
-Res = np.array(Res)
-IdMat = np.array(IdMat)
-
-np.savetxt(config['files']['points'], Ws.reshape(-1, 3), fmt='%f')
-np.savetxt(config['files']['Res'], Res, fmt='%d')
-np.savetxt(config['files']['IdMat'], IdMat, fmt='%d')
-
-# Display overall statistics
-print('Overall statistics from im2points: ************************')
-print(f'Total number of frames (possible 3D points): {NoPoints}')
-print(f'Total number of cameras: {NoCams}')
-print('More important statistics: *******************************')
-print(f'Detected 3D points: {np.sum(np.sum(IdMat, axis=0) > 0)}')
-print(f'Detected 3D points in at least 3 cams: {np.sum(np.sum(IdMat, axis=0) > 2)}')
-print(f'Detected 3D points in ALL cameras: {np.sum(np.sum(IdMat, axis=0) == NoCams)}')
+if __name__ == "__main__":
+    main()
