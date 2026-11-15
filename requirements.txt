@@ -1,6 +1,11 @@
-numpy
-scipy
-matplotlib
-opencv-python
-Pillow
-scikit-image
+# Requires Python 3.12 or newer
+# (the code uses f-string syntax that Python 3.11 rejects).
+#
+# Versions below are the ones the pipeline was run with end to end.
+# Newer numpy 2.x / scipy 1.18 releases break depth_estimation.py.
+numpy==1.26.4
+scipy==1.13.1
+matplotlib==3.8.4
+opencv-python==4.9.0.80
+Pillow==13.0.0
+scikit-image==0.22.0
