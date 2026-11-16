@@ -1,11 +1,16 @@
 # Requires Python 3.12 or newer
 # (the code uses f-string syntax that Python 3.11 rejects).
 #
-# Versions below are the ones the pipeline was run with end to end.
-# Newer numpy 2.x / scipy 1.18 releases break depth_estimation.py.
+# Versions match the working Anaconda environment (Python 3.12.7).
+# numpy must stay on 1.x: newer numpy 2.x / scipy 1.18 break depth_estimation.py.
+#
+# Anaconda users: these packages are usually installed by conda already.
+# Do NOT run "pip install -r requirements.txt" in a conda environment;
+# pip cannot replace conda-installed packages. Use it for a plain Python venv.
 numpy==1.26.4
-scipy==1.13.1
-matplotlib==3.8.4
-opencv-python==4.9.0.80
-Pillow==13.0.0
-scikit-image==0.22.0
+scipy==1.16.0
+matplotlib==3.9.2
+# OpenCV is used only by FindingPoints/. 4.11 is the newest pip build that
+# allows numpy 1.x (4.12 on pip requires numpy 2). Conda's OpenCV 4.12 works too.
+opencv-python==4.11.0.86
+Pillow==10.4.0
